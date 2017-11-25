@@ -1,5 +1,6 @@
 using JLD
-
+using Gurobi
+using GurobiSolver 
 ###################################################
 
 module Optinum
@@ -68,5 +69,40 @@ Data1=loadDataFromFile("obs_behind")
 #obstacle: y_obstacle1=Data1.obstacles[1][2]
 #obstacles are behind: (40,90) et (60,90) [90<100]
 
+m = Model(solver=GurobiSolver())
 
+@variable(m, b)
+@variable(m, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9)
+#V(s) polynome
+#c0, c1, c2,    c3, c4,     c5,     c6,  c7,  c8,      c9
+# 1,  x,  y, theta, xy, xtheta, ytheta, x^2, y^2, theta^2
+
+x_i=Data1.start[1];
+y_i=Data1.start[2];
+theta_i=Data1.start[3];
+#First constraint initially in S_safe
+@constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2)
+
+Nbr_obstacle=size(Data1.obstacles,1)
+i=1
+while i<=Nbr_obstacle
+	x_o=Data1.obstacles[i][1]
+	y_o=Data1.obstacles[i][2]
+	theta_o=0
+	@constraint(m, c0+c1*x_o+c2*y_o+c3*theta_o+c4*x_o*y_o+c5*x_o*theta_o+c6*y_o*theta_o+c7*x_o^2+c8*y_o^2+c9*theta_o^2)
+	i=i+1
+end
+
+
+
+#@SDconstraint(m,M>=0)
+
+#@objective(m, Max, 2*icecream + 7*butter)
+
+#@constraint(m, 3*icecream + 7*butter <= 80)
+#@constraint(m, icecream <= 20)
+#@constraint(m, 1/15*icecream + butter <= 6)
+
+solve(m)
+#println(getvalue(icecream))
 ;
