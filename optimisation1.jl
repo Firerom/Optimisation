@@ -31,20 +31,20 @@ function generateData(numObs::Int)::Optinum.Data
 	leftX = 0.0 # leftmost x value
 	downY = 0.0 # downmost y value
 	minObsDistance = 5 # minimum distance so no obstacle is too close to start or destination
-	
+
 	centerX = leftX + width/2.0
 	centerY = downY + height/2.0
-	
+
 	start = tuple(centerX, downY+2, 0.0)
-	
+
 	destMiddleBandPercentage = 0.7 # be in the middle 70% of allowed x
 	destUpBandPercentage = 0.1 # be in the top 10% of allowed y
 	destination = tuple(rand()*width*destMiddleBandPercentage+leftX+(1-destMiddleBandPercentage)/2.0*width,
 	                    rand()*height*destUpBandPercentage+downY+(1-destUpBandPercentage)*height)
-	
+
 	# all generated x in [leftX, leftX+width]
 	# all generated y in [downY, downY+height]
-	
+
 	obstacles = Array{Tuple{Float64,Float64}}(0)
 	numObsRemain = numObs
 	while true
@@ -60,5 +60,8 @@ function generateData(numObs::Int)::Optinum.Data
 
 	return Optinum.Data(start, destination, obstacles)
 end
+
+Data1=loadDataFromFile("obs_behind")
+
 
 ;
