@@ -62,6 +62,11 @@ function generateData(numObs::Int)::Optinum.Data
 end
 
 Data1=loadDataFromFile("obs_behind")
+#start: (50,100,0) [x,y,theta]
+#destination: (50,190) [x,y]
+#obstacle: x_obstacle1=Data1.obstacles[1][1]
+#obstacle: y_obstacle1=Data1.obstacles[1][2]
+#obstacles are behind: (40,90) et (60,90) [90<100]
 
 
 ;
