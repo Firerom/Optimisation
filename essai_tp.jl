@@ -28,15 +28,9 @@ catch
  using CPLEX
 end
 
-try
- using SCS
-catch
- Pkg.add("SCS")
- using SCS
-end
 
 #m = Model(solver=GurobiSolver())
-m = Model(solver=SCSSolver())
+m = Model(solver=CplexSolver())
 @variable(m, M[1:3,1:3], Symmetric)
 @SDconstraint(m,M>=0)
 @constraint(m,M[1,2]==-1)
