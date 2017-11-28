@@ -1,4 +1,4 @@
-Pkg.add("Mosek")
+#Pkg.add("Mosek")
 
 try
  using JLD
