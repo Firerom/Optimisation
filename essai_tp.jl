@@ -1,4 +1,10 @@
-Pkg.add("Mosek")
+try
+ using Mosek
+catch
+ Pkg.add("Mosek")
+ using Mosek
+end
+
 
 try
  using JLD
@@ -35,8 +41,8 @@ catch
  using SCS
 end
 
-#m = Model(solver=GurobiSolver())
-m = Model(solver=SCSSolver())
+#m = Model(solver=SCSSolver())
+m = Model(solver=MosekSolver())
 @variable(m, M[1:3,1:3], Symmetric)
 @SDconstraint(m,M>=0)
 @constraint(m,M[1,2]==-1)
@@ -45,3 +51,12 @@ m = Model(solver=SCSSolver())
 @constraint(m,M[2,3]==-1)
 @constraint(m,M[3,3]==2)
 solve(m)
+println(getvalue(M[1][1]))
+println(getvalue(M[1][2]))
+println(getvalue(M[1][3]))
+println(getvalue(M[2][1]))
+println(getvalue(M[2][2]))
+println(getvalue(M[2][3]))
+println(getvalue(M[3][1]))
+println(getvalue(M[3][2]))
+println(getvalue(M[3][3]))
