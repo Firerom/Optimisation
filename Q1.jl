@@ -127,13 +127,17 @@ end
 
 
 # yt8: 0
+@constraint(m,0==M[2,11])
 # xt8: 0
+@constraint(m,0==M[3,11])
 # x2: 0
+@constraint(m,0==M[2,2])
 # y2: 0
+@constraint(m,0==M[3,3])
 # xy: 0
+@constraint(m,0==2*M[2,3])
 
-#theta10:0
-@constraint(m,M[4,12]+M[5,11]+M[6,10]+M[7,9]+M[8,8]+M[7,9]+M[6,10]+M[5,11]+M[4,12]==0)
+
 #theta11:0
 @constraint(m,M[5,12]+M[6,11]+M[7,10]+M[8,9]+M[8,9]+M[7,10]+M[6,11]+M[5,12]==0)
 #theta12:0
