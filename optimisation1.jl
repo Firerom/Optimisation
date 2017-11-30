@@ -1,6 +1,7 @@
 using JLD
 using Gurobi
 using JuMP
+using Mosek
 ###################################################
 
 module Optinum
@@ -69,7 +70,7 @@ Data1=loadDataFromFile("obs_behind")
 #obstacle: y_obstacle1=Data1.obstacles[1][2]
 #obstacles are behind: (40,90) et (60,90) [90<100]
 
-m = Model(solver=GurobiSolver())
+m = Model(solver=MosekSolver())
 
 @variable(m, b)
 @variable(m, c0)
@@ -93,16 +94,16 @@ theta_i=Data1.start[3];
 @constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2<=b)
 
 
-Nbr_obstacle=size(Data1.obstacles,1)
-i=1
-while i <= Nbr_obstacle
-	x_o=Data1.obstacles[i][1]
-	y_o=Data1.obstacles[i][2]
-	theta_o=0
+#Nbr_obstacle=size(Data1.obstacles,1)
+#i=1
+#while i <= Nbr_obstacle
+#	x_o=Data1.obstacles[i][1]
+#	y_o=Data1.obstacles[i][2]
+#	theta_o=0
 	#@constraint(m, c0+c1*x_o+c2*y_o+c3*theta_o+c4*x_o*y_o+c5*x_o*theta_o+c6*y_o*theta_o+c7*x_o^2+c8*y_o^2+c9*theta_o^2>b)
-	println(c0+c1*x_o+c2*y_o+c3*theta_o+c4*x_o*y_o+c5*x_o*theta_o+c6*y_o*theta_o+c7*x_o^2+c8*y_o^2+c9*theta_o^2)
-	i+=1
-end
+#	println(c0+c1*x_o+c2*y_o+c3*theta_o+c4*x_o*y_o+c5*x_o*theta_o+c6*y_o*theta_o+c7*x_o^2+c8*y_o^2+c9*theta_o^2)
+#	i+=1
+#end
 
 
 
