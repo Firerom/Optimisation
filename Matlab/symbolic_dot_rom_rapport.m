@@ -14,7 +14,7 @@ syms m11_11 m11_12;
 syms m12_12; 
  
 syms x y theta theta2 theta3 theta4 theta5 theta6 theta7 theta8 theta9 theta10;
-vec_coord=[1 x y theta theta2 theta3 theta4 theta5 theta6 theta7 theta8 theta9 theta10];
+vec_coord=[1 x y theta theta2 theta3 theta4 theta5 theta6 theta7 theta8 theta9];
 Matrix=[m1_1 	m1_2	m1_3	m1_4	m1_5	m1_6	m1_7	m1_8	m1_9	m1_10	m1_11	m1_12
         m1_2 	m2_2 	m2_3	m2_4	m2_5	m2_6	m2_7	m2_8	m2_9	m2_10	m2_11	m2_12	
         m1_3 	m2_3 	m3_3 	m3_4	m3_5	m3_6	m3_7	m3_8	m3_9	m3_10	m3_11	m3_12	
@@ -148,5 +148,5 @@ terme_t9
 terme_t10]
 
 for i=1:length(All_terme)
-    ;
+    fprintf('%c\n',All_terme{i});
 end

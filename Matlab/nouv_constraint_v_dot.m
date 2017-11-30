@@ -3,40 +3,56 @@
 
 
 
-Constraint{1}='c2*v + K*c3*u'
+Constraint{1}='c2*v + K*c3*u';
+Constraint{2}='c4*v + K*c5*u';
+Constraint{3}='2*c8*v + K*c6*u';
+Constraint{4}='- K*c5 - 2*c7*v';
+Constraint{5}='-(c4*v)/2';
+Constraint{6}='(2*c7*v)/6';
+Constraint{7}='(c4*v)/24';
+Constraint{8}='-(2*c7*v)/120';
+Constraint{9}='-(c4*v)/720';
+Constraint{10}='(2*c7*v)/5040';
+Constraint{11}='-(2*c7*v)/362880';
+Constraint{12}='- K*c6 - c4*v';
+Constraint{13}='-(2*c8*v)/2';
+Constraint{14}='(c4*v)/6';
+Constraint{15}='(2*c8*v)/24';
+Constraint{16}='-(c4*v)/120';
+Constraint{17}='-(2*c8*v)/720';
+Constraint{18}='(c4*v)/5040';
+Constraint{19}='-(c4*v)/362880';
+Constraint{20}='c6*v - c1*v - K*c3 + 2*K*c9*u';
+Constraint{21}='- 2*K*c9 - c5*v - (c2*v)/2';
+Constraint{22}='(c1*v)/6 - (c6*v)/2';
+Constraint{23}='(c2*v)/24 + (c5*v)/6';
+Constraint{24}='(c6*v)/24 - (c1*v)/120';
+Constraint{25}='- (c2*v)/720 - (c5*v)/120';
+Constraint{26}='(c1*v)/5040 - (c6*v)/720';
+Constraint{27}='(c5*v)/5040';
+Constraint{28}='-(c1*v)/362880';
+Constraint{29}='-(c5*v)/362880';
 
-                 c4*v + K*c5*u
-               2*c8*v + K*c6*u
-               - K*c5 - 2*c7*v
-                  -(c4*v)/fac2
-                 (2*c7*v)/fac3
-                   (c4*v)/fac4
-                -(2*c7*v)/fac5
-                  -(c4*v)/fac6
-                 (2*c7*v)/fac7
-                -(2*c7*v)/fac9
-                 - K*c6 - c4*v
-                -(2*c8*v)/fac2
-                   (c4*v)/fac3
-                 (2*c8*v)/fac4
-                  -(c4*v)/fac5
-                -(2*c8*v)/fac6
-                   (c4*v)/fac7
-                  -(c4*v)/fac9
- c6*v - c1*v - K*c3 + 2*K*c9*u
- - 2*K*c9 - c5*v - (c2*v)/fac2
-     (c1*v)/fac3 - (c6*v)/fac2
-     (c2*v)/fac4 + (c5*v)/fac3
-     (c6*v)/fac4 - (c1*v)/fac5
-   - (c2*v)/fac6 - (c5*v)/fac5
-     (c1*v)/fac7 - (c6*v)/fac6
-                   (c5*v)/fac7
-                  -(c1*v)/fac9
-                  -(c5*v)/fac9
+Element{1}='M[1,1]';
+Element{2}='2*M[1,2]';
+Element{3}='2*M[1,3]';
+%Element{4}='2*M[2,4]';
+for l=0:1:6
+    index=round(4)+l;
+    Element{index}=['2*M[2,' int2str(4+l) ']'];
+end
+Element{11}='2*M[2,12]';
+for l=0:1:6
+    index=round(12)+l;
+    Element{index}=['2*M[3,' int2str(4+l) ']'];
+end
+Element{19}='2*M[3,12]';
+Element
 
-
-
-
+comment={'1','x','y','xt','xt2','xt3','xt4','xt5','xt6','xt7','xt9','yt','yt2','yt3','yt4','yt5','yt6','yt7','yt9'}
+for l=1:19
+   fprintf('# %s\n@constraint(m,%s==%s)\n',comment{l},Constraint{l},Element{l}) 
+end
 
 
 Taille=12;
