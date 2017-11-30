@@ -74,6 +74,10 @@ small_epsilon=0.000001
 #le nombre d'obstacle
 Nbr_obstacle=size(Data1.obstacles,1)
 
+u=0 #test for pi after
+v=1
+K=0.2
+
 m = Model(solver=MosekSolver())
 
 @variable(m, b)
@@ -129,8 +133,10 @@ for i=1:Nbr_obstacle
 end
 
 #third constraint V_dot
-#theta8:0
-@constraint(m,2*M[1,11]+M[4,10]+M[5,9]+M[6,8]+M[7,7]+M[6,8]+M[5,9]+M[4,10]==0)
+
+# 1
+@constraint(m,M[1,1]==c2*v + K*c3*u);
+
 
 #theta10:0
 @constraint(m,M[4,12]+M[5,11]+M[6,10]+M[7,9]+M[8,8]+M[7,9]+M[6,10]+M[5,11]+M[4,12]==0)
