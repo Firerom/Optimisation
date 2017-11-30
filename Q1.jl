@@ -33,13 +33,13 @@ m = Model(solver=MosekSolver())
 @variable(m,M[1:12,1:12], Symmetric)
 @SDconstraint(m,M<=0)
 
-# matrix obstacle must be symmetric and SDP
+# each matrix obstacle must be symmetric and SDP
 for n=1:Nbr_obstacle
-for i=1:2
-	for j=i:2
-		@constraint(m,M_obs[n,i,j]-M_obs[n,j,i]==0)
+	for i=1:2
+		for j=i:2
+			@constraint(m,M_obs[n,i,j]-M_obs[n,j,i]==0)
+		end
 	end
-end
 @SDconstraint(m,M_obs[n,:,:]>=0)
 end
 
@@ -60,7 +60,7 @@ b=0;
 #First constraint initially in S_safe
 @constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2<=b)
 
-#Second constraint with the obstacles (M_obs already SDP)
+#Second constraint with the obstacles (M_obs already SDP), for each of them
 for i=1:Nbr_obstacle
 	x_o=Data1.obstacles[i][1]
 	y_o=Data1.obstacles[i][2]
