@@ -71,6 +71,7 @@ small_epsilon=0.000001
 #obstacle: y_obstacle1=Data1.obstacles[1][2]
 #obstacles are behind: (40,90) et (60,90) [90<100]
 
+#le nombre d'obstacle
 Nbr_obstacle=size(Data1.obstacles,1)
 
 m = Model(solver=MosekSolver())
@@ -86,8 +87,11 @@ m = Model(solver=MosekSolver())
 @variable(m, c7)
 @variable(m, c8)
 @variable(m, c9)
+#matrices SDP for obstacle constraint
 @variable(m, M_obs[1:Nbr_obstacle,1:2,1:2])
-#@variable(M_Obs, c9)
+#matrix for the Vdot constraint
+@variable(m,M[1:12,1:12], Symmetric)
+@SDconstraint(m,M<=0)
 
 # matrix obstacle must be symmetric and SDP
 for n=1:Nbr_obstacle
@@ -104,19 +108,18 @@ end
 #c0, c1, c2,    c3, c4,     c5,     c6,  c7,  c8,      c9
 # 1,  x,  y, theta, xy, xtheta, ytheta, x^2, y^2, theta^2
 
+#Initial configuration of the drone
 x_i=Data1.start[1];
 y_i=Data1.start[2];
 theta_i=Data1.start[3];
 
-#V is minimum degree 2
-@constraint(m, -(c7+c8+c9)>=0.001)
+#V is minimum degree 2 must be verified or we must impose one more constraint
+#@constraint(m, -(c7+c8+c9)>=0.001)
 
 #First constraint initially in S_safe
 @constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2<=b)
 
-
-
-
+#Second constraint with the obstacles (M_obs already SDP)
 for i=1:Nbr_obstacle
 	x_o=Data1.obstacles[i][1]
 	y_o=Data1.obstacles[i][2]
@@ -125,17 +128,32 @@ for i=1:Nbr_obstacle
 	@constraint(m, M_obs[i,2,2]==c9)
 end
 
+#third constraint V_dot
+#theta8:0
+@constraint(m,2*M[1,11]+M[4,10]+M[5,9]+M[6,8]+M[7,7]+M[6,8]+M[5,9]+M[4,10]==0)
 
-#@SDconstraint(m,M>=0)
-
-#@objective(m, Max, 2*icecream + 7*butter)
-
-#@constraint(m, 3*icecream + 7*butter <= 80)
-#@constraint(m, icecream <= 20)
-#@constraint(m, 1/15*icecream + butter <= 6)
+#theta10:0
+@constraint(m,M[4,12]+M[5,11]+M[6,10]+M[7,9]+M[8,8]+M[7,9]+M[6,10]+M[5,11]+M[4,12]==0)
+#theta11:0
+@constraint(m,M[5,12]+M[6,11]+M[7,10]+M[8,9]+M[8,9]+M[7,10]+M[6,11]+M[5,12]==0)
+#theta12:0
+@constraint(m,M[6,12]+M[7,11]+M[8,10]+M[9,9]+M[8,10]+M[7,11]+M[6,12]==0)
+#theta13:0
+@constraint(m,M[7,12]+M[8,11]+M[9,10]+M[9,10]+M[8,11]+M[7,12]==0)
+#theta14:0
+@constraint(m,M[8,12]+M[9,11]+M[10,10]+M[9,11]+M[8,12]==0)
+#theta15:0
+@constraint(m,M[9,12]+M[10,11]+M[10,11]+M[9,12]==0)
+#theta16:0
+@constraint(m,M[10,12]+M[11,11]+M[10,12]==0)
+#theta17:0
+@constraint(m,M[11,12]+M[11,12]==0)
+#theta18:0
+@constraint(m,M[12,12]==0)
 
 solve(m)
 println("\n")
+println("Les coefficients:")
 println(getvalue(c0))
 println(getvalue(c1))
 println(getvalue(c2))
@@ -143,6 +161,7 @@ println(getvalue(c3))
 println(getvalue(c4))
 println(getvalue(c5))
 println(getvalue(c6))
+# verify (c7~=0 or c8~=0 or c9~=0)==1
 println(getvalue(c7))
 println(getvalue(c8))
 println(getvalue(c9),"\n")
@@ -155,6 +174,6 @@ for n=1:Nbr_obstacle
 	end
 end
 
-
+#@printf("Essai %e",getvalue(b))
 
 ;
