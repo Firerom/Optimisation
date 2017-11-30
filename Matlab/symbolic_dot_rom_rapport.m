@@ -31,7 +31,7 @@ Matrix=[m1_1 	m1_2	m1_3	m1_4	m1_5	m1_6	m1_7	m1_8	m1_9	m1_10	m1_11	m1_12
 
 
 
-syms c0 c1 c2 c3 c4 c5 c6 c7 c8 c9 c10;
+syms c0 c1 c2 c3 c4 c5 c6 c7 c8 c9;
 syms u v fac2 fac3 fac4 fac5 fac6 fac7 fac8 fac9 fac10 K; 
 grad=[c1+c4*y+c5*theta+2*c7*x c2+c4*x+c6*theta+2*c8*y c3+c5*x+c6*y+2*c9*theta];
 sin_theta=theta-theta^3/fac3+theta^5/fac5-theta^7/fac7+theta^9/fac9;
