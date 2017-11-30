@@ -14,6 +14,7 @@ Nbr_obstacle=size(Data1.obstacles,1)
 u=0 #test for pi after
 v=1
 K=0.2
+b=0;
 
 m = Model(solver=MosekSolver())
 
@@ -52,7 +53,7 @@ end
 x_i=Data1.start[1];
 y_i=Data1.start[2];
 theta_i=Data1.start[3];
-b=0;
+
 
 #V is minimum degree 2 must be verified or we must impose one more constraint
 #@constraint(m, -(c7+c8+c9)>=0.001)
