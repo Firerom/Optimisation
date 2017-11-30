@@ -64,11 +64,14 @@ function generateData(numObs::Int)::Optinum.Data
 end
 
 Data1=loadDataFromFile("obs_behind")
+small_epsilon=0.000001
 #start: (50,100,0) [x,y,theta]
 #destination: (50,190) [x,y]
 #obstacle: x_obstacle1=Data1.obstacles[1][1]
 #obstacle: y_obstacle1=Data1.obstacles[1][2]
 #obstacles are behind: (40,90) et (60,90) [90<100]
+
+Nbr_obstacle=size(Data1.obstacles,1)
 
 m = Model(solver=MosekSolver())
 
@@ -83,6 +86,20 @@ m = Model(solver=MosekSolver())
 @variable(m, c7)
 @variable(m, c8)
 @variable(m, c9)
+@variable(m, M_obs[1:Nbr_obstacle,1:2,1:2])
+#@variable(M_Obs, c9)
+
+# matrix obstacle must be symmetric and SDP
+for n=1:Nbr_obstacle
+for i=1:2
+	for j=i:2
+		@constraint(m,M_obs[n,i,j]-M_obs[n,j,i]==0)
+	end
+end
+@SDconstraint(m,M_obs[n,:,:]>=0)
+end
+
+
 #V(s) polynome
 #c0, c1, c2,    c3, c4,     c5,     c6,  c7,  c8,      c9
 # 1,  x,  y, theta, xy, xtheta, ytheta, x^2, y^2, theta^2
@@ -90,21 +107,23 @@ m = Model(solver=MosekSolver())
 x_i=Data1.start[1];
 y_i=Data1.start[2];
 theta_i=Data1.start[3];
+
+#V is minimum degree 2
+@constraint(m, -(c7+c8+c9)>=0.001)
+
 #First constraint initially in S_safe
 @constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2<=b)
 
 
-#Nbr_obstacle=size(Data1.obstacles,1)
-#i=1
-#while i <= Nbr_obstacle
-#	x_o=Data1.obstacles[i][1]
-#	y_o=Data1.obstacles[i][2]
-#	theta_o=0
-	#@constraint(m, c0+c1*x_o+c2*y_o+c3*theta_o+c4*x_o*y_o+c5*x_o*theta_o+c6*y_o*theta_o+c7*x_o^2+c8*y_o^2+c9*theta_o^2>b)
-#	println(c0+c1*x_o+c2*y_o+c3*theta_o+c4*x_o*y_o+c5*x_o*theta_o+c6*y_o*theta_o+c7*x_o^2+c8*y_o^2+c9*theta_o^2)
-#	i+=1
-#end
 
+
+for i=1:Nbr_obstacle
+	x_o=Data1.obstacles[i][1]
+	y_o=Data1.obstacles[i][2]
+	@constraint(m, M_obs[i,1,1]==c0+c1*x_o+c2*y_o+c4*x_o*y_o+c7*x_o^2+c8*y_o^2-b-small_epsilon)
+	@constraint(m, 2*M_obs[i,1,2]==c3+c5*x_o+c6*y_o)
+	@constraint(m, M_obs[i,2,2]==c9)
+end
 
 
 #@SDconstraint(m,M>=0)
@@ -116,5 +135,26 @@ theta_i=Data1.start[3];
 #@constraint(m, 1/15*icecream + butter <= 6)
 
 solve(m)
-#println(getvalue(icecream))
+println("\n")
+println(getvalue(c0))
+println(getvalue(c1))
+println(getvalue(c2))
+println(getvalue(c3))
+println(getvalue(c4))
+println(getvalue(c5))
+println(getvalue(c6))
+println(getvalue(c7))
+println(getvalue(c8))
+println(getvalue(c9),"\n")
+println(getvalue(b),"\n")
+for n=1:Nbr_obstacle
+	for i=1:2
+		for j=1:2
+			println(getvalue(M_obs[n,i,j]))
+		end
+	end
+end
+
+
+
 ;
