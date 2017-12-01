@@ -12,7 +12,7 @@ small_epsilon=0.000001
 Nbr_obstacle=size(Data1.obstacles,1)
 
 u=0 #test for pi after
-v=1
+v=6
 K=0.2
 b=0
 
@@ -48,8 +48,7 @@ for n=1:Nbr_obstacle
 	end
 	@constraint(m,Ab[n,1]-2*M_obs[n,1,2]==0)
 	@constraint(m,Ab[n,2]-(M_obs[n,1,1]-M_obs[n,2,2])==0)
-	@constraint(m,norm(Ab[n,:])  <=(M_obs[n,1,1]+M_obs[n,2,2]) )
-
+	@constraint(m,norm(Ab[n,:])  <=(M_obs[n,1,1]+M_obs[n,2,2]))
 end
 
 
