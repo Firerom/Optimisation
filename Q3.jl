@@ -1,6 +1,6 @@
 include("optimisation1.jl")
 
-Data1=loadDataFromFile("obs_behind_side")
+Data1=loadDataFromFile("obs_behind")
 small_epsilon=0.000001
 #start: (50,100,0) [x,y,theta]
 #destination: (50,190) [x,y]
@@ -11,7 +11,7 @@ small_epsilon=0.000001
 #le nombre d'obstacle
 Nbr_obstacle=size(Data1.obstacles,1)
 
-u=pi #test for pi after
+u=0 #test for pi after
 v=1
 K=0.2
 b=0
@@ -31,33 +31,33 @@ m = Model(solver=MosekSolver())
 #matrices SDP for obstacle constraint
 @variable(m, M_obs[1:Nbr_obstacle,1:2,1:2])
 #matrix for the Vdot constraint
-@variable(m,M[1:12,1:12])
-
+@variable(m,M[1:12,1:12],Symmetric)
+@SDconstraint(m,M<=0)
 # each matrix obstacle must be symmetric and SDP
 for n=1:Nbr_obstacle
-	#=for i=1:2
+	for i=1:2
 		for j=i:2
 			@constraint(m,M_obs[n,i,j]-M_obs[n,j,i]==0)
 		end
-	end=#
-#@SDconstraint(m,M_obs[n,:,:]>=0)
+	end
+@SDconstraint(m,M_obs[n,:,:]>=0)
 @constraint(m,M_obs[n,1,1]>=M_obs[n,1,2])
 @constraint(m,M_obs[n,2,2]>=M_obs[n,2,1])
 end
 
 #Diagonnally dominant matrix
-@constraint(m,M[1,1]<=M[1,2]+M[1,3]+M[1,4]+M[1,5]+M[1,6]+M[1,7]+M[1,8]+M[1,9]+M[1,10]+M[1,11]+M[1,12])
-@constraint(m,M[2,2]<=M[2,1]+M[2,3]+M[2,4]+M[2,5]+M[2,6]+M[2,7]+M[2,8]+M[2,9]+M[2,10]+M[2,11]+M[2,12])
-@constraint(m,M[3,3]<=M[3,1]+M[3,2]+M[3,4]+M[3,5]+M[3,6]+M[3,7]+M[3,8]+M[3,9]+M[3,10]+M[3,11]+M[3,12])
-@constraint(m,M[4,4]<=M[4,1]+M[4,2]+M[4,3]+M[4,5]+M[4,6]+M[4,7]+M[4,8]+M[4,9]+M[4,10]+M[4,11]+M[4,12])
-@constraint(m,M[5,5]<=M[5,1]+M[5,2]+M[5,3]+M[5,4]+M[5,6]+M[5,7]+M[5,8]+M[5,9]+M[5,10]+M[5,11]+M[5,12])
-@constraint(m,M[6,6]<=M[6,1]+M[6,2]+M[6,3]+M[6,4]+M[6,5]+M[6,7]+M[6,8]+M[6,9]+M[6,10]+M[6,11]+M[6,12])
-@constraint(m,M[7,7]<=M[7,1]+M[7,2]+M[7,3]+M[7,4]+M[7,5]+M[7,6]+M[7,8]+M[7,9]+M[7,10]+M[7,11]+M[7,12])
-@constraint(m,M[8,8]<=M[8,1]+M[8,2]+M[8,3]+M[8,4]+M[8,5]+M[8,6]+M[8,7]+M[8,9]+M[8,10]+M[8,11]+M[8,12])
-@constraint(m,M[9,9]<=M[9,1]+M[9,2]+M[9,3]+M[9,4]+M[9,5]+M[9,6]+M[9,7]+M[9,8]+M[9,10]+M[9,11]+M[9,12])
-@constraint(m,M[10,10]<=M[10,1]+M[10,2]+M[10,3]+M[10,4]+M[10,5]+M[10,6]+M[10,7]+M[10,8]+M[10,9]+M[10,11]+M[10,12])
-@constraint(m,M[11,11]<=M[11,1]+M[11,2]+M[11,3]+M[11,4]+M[11,5]+M[11,6]+M[11,7]+M[11,8]+M[11,9]+M[11,10]+M[11,12])
-@constraint(m,M[12,12]<=M[12,1]+M[12,2]+M[12,3]+M[12,4]+M[12,5]+M[12,6]+M[12,7]+M[12,8]+M[12,9]+M[12,10]+M[12,11])
+@constraint(m,-M[1,1]>=-(M[1,2]+M[1,3]+M[1,4]+M[1,5]+M[1,6]+M[1,7]+M[1,8]+M[1,9]+M[1,10]+M[1,11]+M[1,12]))
+@constraint(m,-M[2,2]>=-(M[2,1]+M[2,3]+M[2,4]+M[2,5]+M[2,6]+M[2,7]+M[2,8]+M[2,9]+M[2,10]+M[2,11]+M[2,12]))
+@constraint(m,-M[3,3]>=-(M[3,1]+M[3,2]+M[3,4]+M[3,5]+M[3,6]+M[3,7]+M[3,8]+M[3,9]+M[3,10]+M[3,11]+M[3,12]))
+@constraint(m,-M[4,4]>=-(M[4,1]+M[4,2]+M[4,3]+M[4,5]+M[4,6]+M[4,7]+M[4,8]+M[4,9]+M[4,10]+M[4,11]+M[4,12]))
+@constraint(m,-M[5,5]>=-(M[5,1]+M[5,2]+M[5,3]+M[5,4]+M[5,6]+M[5,7]+M[5,8]+M[5,9]+M[5,10]+M[5,11]+M[5,12]))
+@constraint(m,-M[6,6]>=-(M[6,1]+M[6,2]+M[6,3]+M[6,4]+M[6,5]+M[6,7]+M[6,8]+M[6,9]+M[6,10]+M[6,11]+M[6,12]))
+@constraint(m,-M[7,7]>=-(M[7,1]+M[7,2]+M[7,3]+M[7,4]+M[7,5]+M[7,6]+M[7,8]+M[7,9]+M[7,10]+M[7,11]+M[7,12]))
+@constraint(m,-M[8,8]>=-(M[8,1]+M[8,2]+M[8,3]+M[8,4]+M[8,5]+M[8,6]+M[8,7]+M[8,9]+M[8,10]+M[8,11]+M[8,12]))
+@constraint(m,-M[9,9]>=-(M[9,1]+M[9,2]+M[9,3]+M[9,4]+M[9,5]+M[9,6]+M[9,7]+M[9,8]+M[9,10]+M[9,11]+M[9,12]))
+@constraint(m,-M[10,10]>=-(M[10,1]+M[10,2]+M[10,3]+M[10,4]+M[10,5]+M[10,6]+M[10,7]+M[10,8]+M[10,9]+M[10,11]+M[10,12]))
+@constraint(m,-M[11,11]>=-(M[11,1]+M[11,2]+M[11,3]+M[11,4]+M[11,5]+M[11,6]+M[11,7]+M[11,8]+M[11,9]+M[11,10]+M[11,12]))
+@constraint(m,-M[12,12]>=-(M[12,1]+M[12,2]+M[12,3]+M[12,4]+M[12,5]+M[12,6]+M[12,7]+M[12,8]+M[12,9]+M[12,10]+M[12,11]))
 
 
 
