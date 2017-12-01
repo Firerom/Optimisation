@@ -1,5 +1,5 @@
 clear all; close all;clc;
-Dossier='Result_Q1';
+Dossier='Result_Q3';
 
 u_data=[0 pi];
 file_data={'obs_behind','obs_behind_side'};
@@ -13,7 +13,7 @@ for i=1:length(file_data)
             u='pi';
         end
         file=file_data{i}
-        C=load([Dossier '/Q1_' u '_' file '.txt'])'
+        C=load([Dossier '/Q3_' u '_' file '.txt'])'
         plot_V(C,u,file)
     end
 end
