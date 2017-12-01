@@ -19,7 +19,7 @@ small_epsilon=0.000001
 Nbr_obstacle=size(Data1.obstacles,1)
 
 u=0 #test for pi after
-v=1
+v=6
 K=0.2
 b=0
 
