@@ -6,8 +6,8 @@ function abs_(v::Variable)
   @addConstraint(v.m, aux >= -v)
   return aux
 end
-
-Data1=loadDataFromFile("obs_behind")
+fichier="obs_behind"
+Data1=loadDataFromFile(fichier)
 small_epsilon=0.000001
 #start: (50,100,0) [x,y,theta]
 #destination: (50,190) [x,y]
@@ -229,7 +229,12 @@ for n=1:Nbr_obstacle
 end
 println(getvalue(test))
 #@printf("Essai %e",getvalue(b))
-file_name="Q3_pi_obs_behind.txt"
+if u==pi
+	ustring="pi"
+else
+	ustring="0"
+end
+file_name=string("Q3_",ustring,"_",fichier,".txt")
 ci=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
 writedlm(file_name, ci)
 ;
