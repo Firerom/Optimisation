@@ -49,9 +49,18 @@ end
 Element{19}='2*M[3,12]';
 Element{20}='2*M[1,4]';
 Element{21}='2*M[1,5]+M[4,4]';
+Element{22}='2*M[1,6]+M[4,5]+M[4,5]';
+Element{23}='2*M[1,7]+M[4,6]+M[5,5]+M[4,6]';
+Element{24}='2*M[1,8]+M[4,7]+M[5,6]+M[5,6]+M[4,7]';
+Element{25}='2*M[1,9]+M[4,8]+M[5,7]+M[6,6]+M[5,7]+M[4,8]';
+Element{26}='2*M[1,10]+M[4,9]+M[5,8]+M[6,7]+M[6,7]+M[5,8]+M[4,9]';
+Element{27}='2*M[1,11]+M[4,10]+M[5,9]+M[6,8]+M[7,7]+M[6,8]+M[5,9]+M[4,10]';
+Element{28}='2*M[1,12]+M[4,11]+M[5,10]+M[6,9]+M[7,8]+M[7,8]+M[6,9]+M[5,10]+M[4,11]';
+Element{29}='M[4,12]+M[5,11]+M[6,10]+M[7,9]+M[8,8]+M[7,9]+M[6,10]+M[5,11]+M[4,12]';
 
-comment={'1','x','y','xt','xt2','xt3','xt4','xt5','xt6','xt7','xt9','yt','yt2','yt3','yt4','yt5','yt6','yt7','yt9'}
-for l=1:19
+comment={'1','x','y','xt','xt2','xt3','xt4','xt5','xt6','xt7','xt9','yt','yt2','yt3','yt4','yt5','yt6','yt7','yt9',...
+    't','t1','t2','t3','t4','t5','t6','t7','t8','t9','t10'};
+for l=1:29
    fprintf('# %s\n@constraint(m,%s==%s)\n',comment{l},Constraint{l},Element{l}) 
 end
 
@@ -80,10 +89,10 @@ end
 fprintf(')\n')
 end
 
-for Sum=8:15
+for Sum=8:16
     p=p+1;
     %fprintf('#theta%d:0\n@constraint(m,',p);
-    fprintf('2*M[1,%d]',5+Sum-8);
+    fprintf('M[1,%d]+M[%d,1]',5+Sum-8);
 for i=4:1:Sum-4
     if i~=(Sum-4)
         if i<Sum-i

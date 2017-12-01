@@ -110,3 +110,34 @@ for i=4:1:Sum-4
 end
 fprintf('\n')
 end
+
+
+for Sum=8:16
+    p=p+1;
+    %fprintf('#theta%d:0\n@constraint(m,',p);
+    fprintf('M[1,%d]+M[%d,1]+',5+Sum-8,5+Sum-8);
+for i=4:1:Sum-4
+    if i~=(Sum-4)
+        fprintf('M[%d,%d]+',i,Sum-i)  
+    else
+        fprintf('M[%d,%d]',i,Sum-i)
+    end
+end
+fprintf('\n')
+end
+
+Taille=12;
+Sum=20;
+p=9;
+for Sum=16:24
+    p=p+1;
+    fprintf('#theta%d:0\n@constraint(m,',p);
+for i=Sum-Taille:1:Taille
+    if i~=Taille
+        fprintf('M[%d,%d]+',i,Sum-i)
+    else
+        fprintf('M[%d,%d]==0',i,Sum-i)
+    end
+end
+fprintf(')\n')
+end
