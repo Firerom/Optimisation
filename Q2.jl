@@ -209,5 +209,7 @@ for n=1:Nbr_obstacle
 	end
 end
 
-
+file_name="Q2_ci.txt"
+ci=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
+writedlm(file_name, ci)
 ;

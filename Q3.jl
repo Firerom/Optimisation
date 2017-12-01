@@ -216,5 +216,7 @@ for n=1:Nbr_obstacle
 end
 println(getvalue(test))
 #@printf("Essai %e",getvalue(b))
-
+file_name="Q3_ci.txt"
+ci=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
+writedlm(file_name, ci)
 ;
