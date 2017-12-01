@@ -31,19 +31,24 @@ m = Model(solver=MosekSolver())
 #matrices SDP for obstacle constraint
 @variable(m, M_obs[1:Nbr_obstacle,1:2,1:2])
 #matrix for the Vdot constraint
-@variable(m,M[1:12,1:12])# on peut laisser ça, ça marche aussi
+@variable(m,M[1:12,1:12])
+#variable de stockage pour le calcul de la norm (on a besoin d'un vecteur de taille 2  pour les Nbr_obstacle 2X2 matrix)
+@variable(m,Ab[1:Nbr_obstacle,1:2])
+#variable de stockage pour le calcul de la norm (on a besoin d'un vecteur de taille 2 ) pour chaque 2X2 matrix ! ça donne 12X12 vector
+@variable(m,Ab_dot[1:12,1:12,1:2])
 #@SDconstraint(m,M<=0)
 
 for n=1:Nbr_obstacle
 	for i=1:2
 		for j=i:2
 			@constraint(m,M_obs[n,i,j]-M_obs[n,j,i]==0)
-
 		end
 		#element diagonaux supéreiur à zero
 		@constraint(m,M_obs[n,i,i]>=0)
 	end
-	@constraint(m,((2*M_obs[n,1,2])^2+(M_obs[n,1,1]-M_obs[n,2,2])^2)  <=(M_obs[n,1,1]+M_obs[n,2,2])^2 )
+	@constraint(m,Ab[n,1]-2*M_obs[n,1,2]==0)
+	@constraint(m,Ab[n,2]-(M_obs[n,1,1]-M_obs[n,2,2])==0)
+	@constraint(m,norm(Ab[n,:])  <=(M_obs[n,1,1]+M_obs[n,2,2]) )
 
 end
 
@@ -54,13 +59,15 @@ end
 #
 ###
 for i=1:12
-	for j=i:12
+	for j=(i+1):12
 		@constraint(m,M[i,j]-M[j,i]==0)
-		@constraint(m,(2*M[i,j])^2+(M[i,i]-M[j,j])^2  <=(M[i,i]+M[j,j])^2 )
-
+		#@constraint(m,(2*M[i,j])^2+(M[i,i]-M[j,j])^2  <=(M[i,i]+M[j,j])^2 )
+		@constraint(m,Ab_dot[i,j,1]-2*M[i,j]==0)
+		@constraint(m,Ab_dot[i,j,2]-(M[i,i]-M[j,j])==0)
+		@constraint(m,norm(Ab_dot[i,j,:])  <=-(M[i,i]+M[j,j]) )
 	end
 	#element diagonaux inférieur à zero
-	@constraint(m,M[i,i]>=0)
+	@constraint(m,M[i,i]<=0)
 end
 #V(s) polynome
 #c0, c1, c2,    c3, c4,     c5,     c6,  c7,  c8,      c9
@@ -88,7 +95,6 @@ for i=1:Nbr_obstacle
 end
 
 #third constraint V_dot
-
 # 1
 @constraint(m,c2*v + K*c3*u==M[1,1])
 # x
@@ -205,12 +211,5 @@ for n=1:Nbr_obstacle
 	end
 end
 
-#@printf("Essai %e",getvalue(b))
-#m = Model(solver=MosekSolver())
-#@variable(m, x[1:2] >= 1)
-#@variable(m, t)
-#@objective(m, Min, t)
-#@constraint(m, soc, norm( x[i] for i=1:2 ) <= t)
-#status = solve(m)
 
 ;
