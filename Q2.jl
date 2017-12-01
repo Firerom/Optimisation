@@ -31,20 +31,37 @@ m = Model(solver=MosekSolver())
 #matrices SDP for obstacle constraint
 @variable(m, M_obs[1:Nbr_obstacle,1:2,1:2])
 #matrix for the Vdot constraint
-@variable(m,M[1:12,1:12], Symmetric)
-@SDconstraint(m,M<=0)
+@variable(m,M[1:12,1:12])# on peut laisser ça, ça marche aussi
+#@SDconstraint(m,M<=0)
 
-# each matrix obstacle must be symmetric and SDP
 for n=1:Nbr_obstacle
 	for i=1:2
 		for j=i:2
 			@constraint(m,M_obs[n,i,j]-M_obs[n,j,i]==0)
+
 		end
+		#element diagonaux supéreiur à zero
+		@constraint(m,M_obs[n,i,i]>=0)
 	end
-@SDconstraint(m,M_obs[n,:,:]>=0)
+	@constraint(m,((2*M_obs[n,1,2])^2+(M_obs[n,1,1]-M_obs[n,2,2])^2)  <=(M_obs[n,1,1]+M_obs[n,2,2])^2 )
+
 end
 
 
+###
+# WARNING
+#the matrix should be semi-definite neagtive
+#
+###
+for i=1:12
+	for j=i:12
+		@constraint(m,M[i,j]-M[j,i]==0)
+		@constraint(m,(2*M[i,j])^2+(M[i,i]-M[j,j])^2  <=(M[i,i]+M[j,j])^2 )
+
+	end
+	#element diagonaux inférieur à zero
+	@constraint(m,M[i,i]>=0)
+end
 #V(s) polynome
 #c0, c1, c2,    c3, c4,     c5,     c6,  c7,  c8,      c9
 # 1,  x,  y, theta, xy, xtheta, ytheta, x^2, y^2, theta^2
@@ -189,5 +206,11 @@ for n=1:Nbr_obstacle
 end
 
 #@printf("Essai %e",getvalue(b))
+#m = Model(solver=MosekSolver())
+#@variable(m, x[1:2] >= 1)
+#@variable(m, t)
+#@objective(m, Min, t)
+#@constraint(m, soc, norm( x[i] for i=1:2 ) <= t)
+#status = solve(m)
 
 ;
