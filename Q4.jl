@@ -17,7 +17,7 @@ u=pi #test for pi after
 v=6
 K=0.2
 b=0
-
+w=0
 m = Model(solver=MosekSolver())
 
 @variable(m, c0)
@@ -106,6 +106,68 @@ for i=1:Nbr_obstacle
 end
 
 #third constraint V_dot
+#1
+@constraint(m, M[1,1]==(c2*v + c1*w + K*c3*u))
+#x
+@constraint(m, 2*M[1,2]==(c5*v + 2*c4*w + K*c7*u))
+#y
+@constraint(m, 2*M[1,3]==(2*c6*v + c5*w + K*c8*u))
+#t
+@constraint(m, 2*M[1,4]==(2*c6*v + c5*w + K*c8*u))
+#x^2
+@constraint(m, 2*M[1,6]+M[2,2]==(c11*v + 3*c10*w + K*c14*u))
+#y^2
+@constraint(m, 2*M[1,7]+M[3,3]==  (3*c13*v + c12*w + K*c16*u))
+#t^2
+@constraint(m, 2*M[1,8]+M[4,4]== (c18*v + c17*w + 3*K*c19*u))
+#x*y
+@constraint(m, 2*M[1,5]+2*M[2,3]== (2*c12*v + 2*c11*w + K*c15*u))
+#t*x
+@constraint(m, 2*M[2,4]== (c15*v + 2*c14*w + 2*K*c17*u))
+#t*y
+@constraint(m, 2*M[3,4]== (2*c16*v + c15*w + 2*K*c18*u))
+#x^3
+@constraint(m, 2*M[2,6]== (c21*v + 4*c20*w + K*c25*u))
+#y^3
+@constraint(m, 2*M[3,7]==(4*c24*v + c23*w + K*c28*u))
+#x*y^2
+@constraint(m, 2*M[2,7]+M[3,5]== (3*c23*v + 2*c22*w + K*c27*u))
+#t^2*x
+@constraint(m, 2*M[2,8]==(c30*v + 2*c29*w + 3*K*c32*u))
+#x^2*y
+@constraint(m, 2*M[2,5]+M[3,6]== (2*c22*v + 3*c21*w + K*c26*u))
+#t^2*y
+@constraint(m, 2*M[3,8]==(2*c31*v + c30*w + 3*K*c33*u))
+#t^3
+@constraint(m, 2*M[4,8]== (c33*v + c32*w + 4*K*c34*u))
+#t*x^2
+@constraint(m, 2*M[4,6]== (c26*v + 3*c25*w + 2*K*c29*u))
+#t*y^2
+@constraint(m, 2*M[4,7]==(3*c28*v + c27*w + 2*K*c31*u))
+#t*x*y
+@constraint(m, 2*M[4,5]== (2*c27*v + 2*c26*w + 2*K*c30*u))
+#x4
+@constraint(m, M[6,6]==0)
+#y^4
+@constraint(m, M[7,7]==0)
+#t^4
+@constraint(m, M[8,8]==0)
+#x^2*y^2
+@constraint(m, M[5,5]+2*M[6,7]==0)
+#t^2*x^2
+@constraint(m, 2*M[6,8]==0)
+#t^2*y^2
+@constraint(m, 2*M[7,8]==0)
+#t^2*x*y
+@constraint(m, 2*M[5,8]==0)
+#x^3*y
+@constraint(m, 2*M[5,6]==0)
+#x*y^3
+@constraint(m, 2*M[5,6]==0)
+
+
+
+
 
 solve(m)
 println("\n")
