@@ -62,6 +62,12 @@ m = Model(solver=MosekSolver())
 @variable(m, M_obs[1:Nbr_obstacle,1:3,1:3])
 #matrix for the Vdot constraint
 @variable(m,M[1:8,1:8])
+#matrix fro the V_s sontaint
+@variable(m, M_s[1:3,1:3])
+@variable(m,h)
+@objective(m, Min, h)
+
+
 @SDconstraint(m,M<=0)
 for n=1:Nbr_obstacle
 	for i=1:3
@@ -71,7 +77,7 @@ for n=1:Nbr_obstacle
 	end
 @SDconstraint(m,M_obs[n,:,:]>=0)
 end
-
+@SDconstraint(m,M_s<=0)
 
 # V(s)
 # c0 c1 c2 c3   c4   c5  c6  c7  c8  c9   c10 c11  c12  c13 c14   c15  c16   c17
@@ -165,7 +171,15 @@ end
 #x*y^3
 @constraint(m, 2*M[5,6]==0)
 
-
+#fourth constraint V(S_final)<h
+x_o=Data1.destination[1]
+y_o=Data1.destination[2]
+@constraint(m, M_s[1,1]==c20*x_o^4 + c21*x_o^3*y_o + c10*x_o^3 + c22*x_o^2*y_o^2 + c11*x_o^2*y_o + c4*x_o^2 + c23*x_o*y_o^3 + c12*x_o*y_o^2 + c5*x_o*y_o + c1*x_o + c24*y_o^4
++ c13*y_o^3 + c6*y_o^2 + c2*y_o + c0-h-small_epsilon)
+@constraint(m, 2*M_s[1,2]==c25*x_o^3 + c26*x_o^2*y_o + c14*x_o^2 + c27*x_o*y_o^2 + c15*x_o*y_o + c7*x_o + c28*y_o^3 + c16*y_o^2 + c8*y_o + c3)
+@constraint(m, M_s[2,2]+2*M_s[1,3]==c29*x_o^2 + c30*x_o*y_o + c17*x_o + c31*y_o^2 + c18*y_o + c9)
+@constraint(m, 2*M_s[2,3]==c19 + c32*x_o + c33*y_o)
+@constraint(m, M_s[3,3]==c34)
 
 
 
@@ -197,7 +211,7 @@ if u==pi
 else
 	ustring="0"
 end
-file_name=string("Q1_",ustring,"_",fichier,".txt")
+file_name=string("Q4_",ustring,"_",fichier,".txt")
 ci=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
 writedlm(file_name, ci)
 
