@@ -7,7 +7,6 @@ numbers = rand(5,5)
 open("romain2.txt", "w") do f
         write(f, "$numbers \n")
 end# ne mets aucun espace , il faut boucler et oragniser comme on veut
-
-
+filename=string("romain", "esssaie",".txt")
 numbers = rand(5,5)
-writedlm("romain1.txt", numbers)#organise comme on veut
+writedlm(filename, numbers)#organise comme on veut
