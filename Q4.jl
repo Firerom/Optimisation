@@ -1,11 +1,6 @@
 include("optimisation1.jl")
 
-function abs_(v::Variable)
-  @defVar(v.m, aux >= 0)
-  @addConstraint(v.m, aux >= v)
-  @addConstraint(v.m, aux >= -v)
-  return aux
-end
+
 fichier="obs_behind"
 Data1=loadDataFromFile(fichier)
 small_epsilon=0.000001
@@ -90,25 +85,26 @@ y_i=Data1.start[2];
 theta_i=Data1.start[3];
 
 
-#V is minimum degree 2 must be verified or we must impose one more constraint
+#V is minimum degree 5 must be verified or we must impose one more constraint
 #@constraint(m, -(c7+c8+c9)>=0.001)
 
 #First constraint initially in S_safe
-@constraint(m, c34*theta_i^4 + c32*theta_i^3*x_i + c33*theta_i^3*y_i + c19*theta_i^3 + c29*theta_i^2*x_i^2 + c30*theta_i^2*x_i*y_i + c17*theta_i^2*x_i + c31*theta_i^2*y_i^2 + c18*theta_i^2*y_i + c9*theta_i^2 + c25*theta_i*x_i^3 + c26*theta_i*x_i^2*y_i + c14*theta_i*x_i^2 + c27*theta_i*x_i*y_i^2 + c15*theta_i*x_i*y_i + c7*theta_i*x_i + c28*theta_i*y_i^3 + c16*theta_i*y_i^2 + c8*theta_i*y_i + c3*theta_i + c20*x_i^4 + c21*x_i^3*y_i + c10*x_i^3 + c22*x_i^2*y_i^2 + c11*x_i^2*y_i + c4*x_i^2 + c23*x_i*y_i^3 + c12*x_i*y_i^2 + c5*x_i*y_i + c1*x_i + c24*y_i^4 + c13*y_i^3 + c6*y_i^2 + c2*y_i + c0<=b)
-#c34*theta_i^4 + c32*theta_i^3*x_i + c33*theta_i^3*y_i + c19*theta_i^3 + c29*theta_i^2*x_i^2 + c30*theta_i^2*x_i*y_i + c17*theta_i^2*x_i + c31*theta_i^2*y_i^2 + c18*theta_i^2*y_i + c9*theta_i^2 + c25*theta_i*x_i^3 + c26*theta_i*x_i^2*y_i + c14*theta_i*x_i^2 + c27*theta_i*x_i*y_i^2 + c15*theta_i*x_i*y_i + c7*theta_i*x_i + c28*theta_i*y_i^3 + c16*theta_i*y_i^2 + c8*theta_i*y_i + c3*theta_i + c20*x_i^4 + c21*x_i^3*y_i + c10*x_i^3 + c22*x_i^2*y_i^2 + c11*x_i^2*y_i + c4*x_i^2 + c23*x_i*y_i^3 + c12*x_i*y_i^2 + c5*x_i*y_i + c1*x_i + c24*y_i^4 + c13*y_i^3 + c6*y_i^2 + c2*y_i + c0
+@constraint(m, c34*theta_i^4 + c32*theta_i^3*x_i + c33*theta_i^3*y_i + c19*theta_i^3 + c29*theta_i^2*x_i^2 + c30*theta_i^2*x_i*y_i + c17*theta_i^2*x_i + c31*theta_i^2*y_i^2 + c18*theta_i^2*y_i + c9*theta_i^2 + c25*theta_i*x_i^3
++ c26*theta_i*x_i^2*y_i + c14*theta_i*x_i^2 + c27*theta_i*x_i*y_i^2 + c15*theta_i*x_i*y_i + c7*theta_i*x_i + c28*theta_i*y_i^3 + c16*theta_i*y_i^2 + c8*theta_i*y_i + c3*theta_i + c20*x_i^4 + c21*x_i^3*y_i + c10*x_i^3 + c22*x_i^2*y_i^2
++ c11*x_i^2*y_i + c4*x_i^2 + c23*x_i*y_i^3 + c12*x_i*y_i^2 + c5*x_i*y_i + c1*x_i + c24*y_i^4 + c13*y_i^3 + c6*y_i^2 + c2*y_i + c0<=b)
 #Second constraint with the obstacles (M_obs already SDP), for each of them
 for i=1:Nbr_obstacle
 	x_o=Data1.obstacles[i][1]
 	y_o=Data1.obstacles[i][2]
-	@constraint(m, M_obs[i,1,1]==c20*x_o^4 + c21*x_o^3*y_o + c10*x_o^3 + c22*x_o^2*y_o^2 + c11*x_o^2*y_o + c4*x_o^2 + c23*x_o*y_o^3 + c12*x_o*y_o^2 + c5*x_o*y_o + c1*x_o + c24*y_o^4 + c13*y_o^3 + c6*y_o^2 + c2*y_o + c0
- -b-small_epsilon)
-	@constraint(m, 2*M_obs[i,1,2]==c25*x_o^3 + c26*x_o^2*y_o + c14*x_o^2 + c27*x_o*y_o^2 + c15*x_o*y_o + c7*x_o + c28*y_o^3 + c16*y_o^2 + c8*y_o + c3
- )
+	@constraint(m, M_obs[i,1,1]==c20*x_o^4 + c21*x_o^3*y_o + c10*x_o^3 + c22*x_o^2*y_o^2 + c11*x_o^2*y_o + c4*x_o^2 + c23*x_o*y_o^3 + c12*x_o*y_o^2 + c5*x_o*y_o + c1*x_o + c24*y_o^4
+	+ c13*y_o^3 + c6*y_o^2 + c2*y_o + c0-b-small_epsilon)
+	@constraint(m, 2*M_obs[i,1,2]==c25*x_o^3 + c26*x_o^2*y_o + c14*x_o^2 + c27*x_o*y_o^2 + c15*x_o*y_o + c7*x_o + c28*y_o^3 + c16*y_o^2 + c8*y_o + c3)
 	@constraint(m, M_obs[i,2,2]+2*M_obs[i,1,3]==c29*x_o^2 + c30*x_o*y_o + c17*x_o + c31*y_o^2 + c18*y_o + c9)
 	@constraint(m, 2*M_obs[i,2,3]==c19 + c32*x_o + c33*y_o)
 	@constraint(m, M_obs[i,3,3]==c34)
 
 end
+
 #third constraint V_dot
 
 solve(m)
@@ -127,8 +123,8 @@ println(getvalue(c8))
 println(getvalue(c9),"\n")
 
 for n=1:Nbr_obstacle
-	for i=1:2
-		for j=1:2
+	for i=1:3
+		for j=1:3
 			println(getvalue(M_obs[n,i,j]))
 		end
 	end
