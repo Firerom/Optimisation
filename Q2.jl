@@ -58,7 +58,7 @@ end
 #
 ###
 for i=1:12
-	for j=(i+1):12
+	for j=i:12
 		@constraint(m,M[i,j]-M[j,i]==0)
 		@constraint(m,Ab_dot[i,j,1]-2*M[i,j]==0)
 		@constraint(m,Ab_dot[i,j,2]-(M[i,i]-M[j,j])==0)

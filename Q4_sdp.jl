@@ -61,12 +61,12 @@ m = Model(solver=MosekSolver())
 #matrices SDP for obstacle constraint
 @variable(m, M_obs[1:Nbr_obstacle,1:3,1:3])
 #matrix for the Vdot constraint
-@variable(m,M[1:8,1:8])
+@variable(m,M[1:8,1:8], Symmetric)
 #matrix fro the V_s sontaint
-@variable(m, M_s[1:3,1:3])
+@variable(m, M_s[1:3,1:3], Symmetric)
 @variable(m,h)
 @objective(m, Min, h)
-
+#h=-9999999999999
 
 @SDconstraint(m,M<=0)
 for n=1:Nbr_obstacle
