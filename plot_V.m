@@ -132,7 +132,7 @@ a = get(gca, 'ZLim');
         
 % Always put contour below the plot.
 zpos = a(1);
-possible_puissance=[1e-8 1e-7 1e-6 1e-5 1e-4 1e-3 1e-2 1e-1 1 1e1 1e2 1e3];
+possible_puissance=[1e-10 1e-9 1e-8 1e-7 1e-6 1e-5 1e-4 1e-3 1e-2 1e-1 1 1e1 1e2 1e3];
 puissance_ok=0;
 i=length(possible_puissance);
 Max_valueee=max(max(V_valeur))
