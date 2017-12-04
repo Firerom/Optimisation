@@ -13,7 +13,7 @@ small_epsilon=0.000001
 #le nombre d'obstacle
 Nbr_obstacle=size(Data1.obstacles,1)
 
-u=pi #test for pi after
+u=0 #test for pi after
 v=6
 K=0.2
 b=0
@@ -245,7 +245,7 @@ if u==pi
 else
 	ustring="0"
 end
-file_name=string("Q4_",ustring,"_",fichier,".txt")
+file_name=string("Q4_SOCP_",ustring,"_",fichier,".txt")
 ci=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
 writedlm(file_name, ci)
 
