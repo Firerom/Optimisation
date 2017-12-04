@@ -6,19 +6,19 @@ function abs_(v::Variable)
   @addConstraint(v.m, aux >= -v)
   return aux
 end
-fichier="obs_behind"
+fichier="obs_behind_side"
 Data1=loadDataFromFile(fichier)
-small_epsilon=0.000001
+small_epsilon=0.00000001
 #start: (50,100,0) [x,y,theta]
 #destination: (50,190) [x,y]
 #obstacle: x_obstacle1=Data1.obstacles[1][1]
 #obstacle: y_obstacle1=Data1.obstacles[1][2]
-#obstacles are behind: (40,90) et (60,90) [90<100]
+#obstacles are behind: (40,90) et (60,90) [90,100]
 
 #le nombre d'obstacle
 Nbr_obstacle=size(Data1.obstacles,1)
 
-u=pi #test for pi after
+u=0 #test for pi after
 v=6
 K=0.2
 b=0
@@ -35,7 +35,6 @@ m = Model(solver=MosekSolver())
 @variable(m, c7)
 @variable(m, c8)
 @variable(m, c9)
-@variable(m, test)
 #matrices SDP for obstacle constraint
 @variable(m, M_obs[1:Nbr_obstacle,1:2,1:2])
 #matrix for the Vdot constraint
@@ -55,29 +54,29 @@ end
 
 #Diagonnally dominant matrix
 #POURQUOI <= sum(abs) et non <= -sum(abs) ??
-@constraint(m,M[1,1]<=abs_(M[1,2])+abs_(M[1,3])+abs_(M[1,4])+abs_(M[1,5])+abs_(M[1,6])+abs_(M[1,7])+abs_(M[1,8])+abs_(M[1,9])+abs_(M[1,10])
+@constraint(m,abs_(M[1,1])>=abs_(M[1,2])+abs_(M[1,3])+abs_(M[1,4])+abs_(M[1,5])+abs_(M[1,6])+abs_(M[1,7])+abs_(M[1,8])+abs_(M[1,9])+abs_(M[1,10])
 +abs_(M[1,11])+abs_(M[1,12]))
-@constraint(m,M[2,2]<=abs_(M[2,1])+abs_(M[2,3])+abs_(M[2,4])+abs_(M[2,5])+abs_(M[2,6])+abs_(M[2,7])+abs_(M[2,8])+abs_(M[2,9])+abs_(M[2,10])
+@constraint(m,abs_(M[2,2])>=abs_(M[2,1])+abs_(M[2,3])+abs_(M[2,4])+abs_(M[2,5])+abs_(M[2,6])+abs_(M[2,7])+abs_(M[2,8])+abs_(M[2,9])+abs_(M[2,10])
 +abs_(M[2,11])+abs_(M[2,12]))
-@constraint(m,M[3,3]<=abs_(M[3,1])+abs_(M[3,2])+abs_(M[3,4])+abs_(M[3,5])+abs_(M[3,6])+abs_(M[3,7])+abs_(M[3,8])+abs_(M[3,9])+abs_(M[3,10])
+@constraint(m,abs_(M[3,3])>=abs_(M[3,1])+abs_(M[3,2])+abs_(M[3,4])+abs_(M[3,5])+abs_(M[3,6])+abs_(M[3,7])+abs_(M[3,8])+abs_(M[3,9])+abs_(M[3,10])
 +abs_(M[3,11])+abs_(M[3,12]))
-@constraint(m,M[4,4]<=abs_(M[4,1])+abs_(M[4,2])+abs_(M[4,3])+abs_(M[4,5])+abs_(M[4,6])+abs_(M[4,7])+abs_(M[4,8])+abs_(M[4,9])+abs_(M[4,10])
+@constraint(m,abs_(M[4,4])>=abs_(M[4,1])+abs_(M[4,2])+abs_(M[4,3])+abs_(M[4,5])+abs_(M[4,6])+abs_(M[4,7])+abs_(M[4,8])+abs_(M[4,9])+abs_(M[4,10])
 +abs_(M[4,11])+abs_(M[4,12]))
-@constraint(m,M[5,5]<=abs_(M[5,1])+abs_(M[5,2])+abs_(M[5,3])+abs_(M[5,4])+abs_(M[5,6])+abs_(M[5,7])+abs_(M[5,8])+abs_(M[5,9])+abs_(M[5,10])
+@constraint(m,abs_(M[5,5])>=abs_(M[5,1])+abs_(M[5,2])+abs_(M[5,3])+abs_(M[5,4])+abs_(M[5,6])+abs_(M[5,7])+abs_(M[5,8])+abs_(M[5,9])+abs_(M[5,10])
 +abs_(M[5,11])+abs_(M[5,12]))
-@constraint(m,M[6,6]<=abs_(M[6,1])+abs_(M[6,2])+abs_(M[6,3])+abs_(M[6,4])+abs_(M[6,5])+abs_(M[6,7])+abs_(M[6,8])+abs_(M[6,9])+abs_(M[6,10])
+@constraint(m,abs_(M[6,6])>=abs_(M[6,1])+abs_(M[6,2])+abs_(M[6,3])+abs_(M[6,4])+abs_(M[6,5])+abs_(M[6,7])+abs_(M[6,8])+abs_(M[6,9])+abs_(M[6,10])
 +abs_(M[6,11])+abs_(M[6,12]))
-@constraint(m,M[7,7]<=abs_(M[7,1])+abs_(M[7,2])+abs_(M[7,3])+abs_(M[7,4])+abs_(M[7,5])+abs_(M[7,6])+abs_(M[7,8])+abs_(M[7,9])+abs_(M[7,10])
+@constraint(m,abs_(M[7,7])>=abs_(M[7,1])+abs_(M[7,2])+abs_(M[7,3])+abs_(M[7,4])+abs_(M[7,5])+abs_(M[7,6])+abs_(M[7,8])+abs_(M[7,9])+abs_(M[7,10])
 +abs_(M[7,11])+abs_(M[7,12]))
-@constraint(m,M[8,8]<=abs_(M[8,1])+abs_(M[8,2])+abs_(M[8,3])+abs_(M[8,4])+abs_(M[8,5])+abs_(M[8,6])+abs_(M[8,7])+abs_(M[8,9])+abs_(M[8,10])
+@constraint(m,abs_(M[8,8])>=abs_(M[8,1])+abs_(M[8,2])+abs_(M[8,3])+abs_(M[8,4])+abs_(M[8,5])+abs_(M[8,6])+abs_(M[8,7])+abs_(M[8,9])+abs_(M[8,10])
 +abs_(M[8,11])+abs_(M[8,12]))
-@constraint(m,M[9,9]<=abs_(M[9,1])+abs_(M[9,2])+abs_(M[9,3])+abs_(M[9,4])+abs_(M[9,5])+abs_(M[9,6])+abs_(M[9,7])+abs_(M[9,8])+abs_(M[9,10])
+@constraint(m,abs_(M[9,9])>=abs_(M[9,1])+abs_(M[9,2])+abs_(M[9,3])+abs_(M[9,4])+abs_(M[9,5])+abs_(M[9,6])+abs_(M[9,7])+abs_(M[9,8])+abs_(M[9,10])
 +abs_(M[9,11])+abs_(M[9,12]))
-@constraint(m,M[10,10]<=abs_(M[10,1])+abs_(M[10,2])+abs_(M[10,3])+abs_(M[10,4])+abs_(M[10,5])+abs_(M[10,6])+abs_(M[10,7])+abs_(M[10,8])+abs_(M[10,9])
+@constraint(m,abs_(M[10,10])>=abs_(M[10,1])+abs_(M[10,2])+abs_(M[10,3])+abs_(M[10,4])+abs_(M[10,5])+abs_(M[10,6])+abs_(M[10,7])+abs_(M[10,8])+abs_(M[10,9])
 +abs_(M[10,11])+abs_(M[10,12]))
-@constraint(m,M[11,11]<=abs_(M[11,1])+abs_(M[11,2])+abs_(M[11,3])+abs_(M[11,4])+abs_(M[11,5])+abs_(M[11,6])+abs_(M[11,7])+abs_(M[11,8])+abs_(M[11,9])
+@constraint(m,abs_(M[11,11])>=abs_(M[11,1])+abs_(M[11,2])+abs_(M[11,3])+abs_(M[11,4])+abs_(M[11,5])+abs_(M[11,6])+abs_(M[11,7])+abs_(M[11,8])+abs_(M[11,9])
 +abs_(M[11,10])+abs_(M[11,12]))
-@constraint(m,M[12,12]<=abs_(M[12,1])+abs_(M[12,2])+abs_(M[12,3])+abs_(M[12,4])+abs_(M[12,5])+abs_(M[12,6])+abs_(M[12,7])+abs_(M[12,8])+abs_(M[12,9])
+@constraint(m,abs_(M[12,12])>=abs_(M[12,1])+abs_(M[12,2])+abs_(M[12,3])+abs_(M[12,4])+abs_(M[12,5])+abs_(M[12,6])+abs_(M[12,7])+abs_(M[12,8])+abs_(M[12,9])
 +abs_(M[12,10])+abs_(M[12,11]))
 
 
@@ -96,7 +95,7 @@ theta_i=Data1.start[3];
 #@constraint(m, -(c7+c8+c9)>=0.001)
 
 #First constraint initially in S_safe
-@constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2<=b)
+@constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2+small_epsilon<=b)
 
 #Second constraint with the obstacles (M_obs already SDP), for each of them
 for i=1:Nbr_obstacle
@@ -110,65 +109,65 @@ end
 #third constraint V_dot
 
 # 1
-@constraint(m,c2*v + K*c3*u==M[1,1])
+@constraint(m,c2*v + K*c3*u==-M[1,1])
 # x
-@constraint(m,c4*v + K*c5*u==M[1,2]+M[2,1])
+@constraint(m,c4*v + K*c5*u==-(M[1,2]+M[2,1]))
 # y
-@constraint(m,2*c8*v + K*c6*u==M[1,3]+M[3,1])
+@constraint(m,2*c8*v + K*c6*u==-(M[1,3]+M[3,1]))
 # xt
-@constraint(m,- K*c5 - 2*c7*v==M[2,4]+M[4,2])
+@constraint(m,- K*c5 - 2*c7*v==-(M[2,4]+M[4,2]))
 # xt2
-@constraint(m,-(c4*v)/2==M[2,5]+M[5,2])
+@constraint(m,-(c4*v)/2==-(M[2,5]+M[5,2]))
 # xt3
-@constraint(m,(2*c7*v)/6==M[2,6]+M[6,2])
+@constraint(m,(2*c7*v)/6==-(M[2,6]+M[6,2]))
 # xt4
-@constraint(m,(c4*v)/24==M[2,7]+M[7,2])
+@constraint(m,(c4*v)/24==-(M[2,7]+M[7,2]))
 # xt5
-@constraint(m,-(2*c7*v)/120==M[2,8]+M[8,2])
+@constraint(m,-(2*c7*v)/120==-(M[2,8]+M[8,2]))
 # xt6
-@constraint(m,-(c4*v)/720==M[2,9]+M[9,2])
+@constraint(m,-(c4*v)/720==-(M[2,9]+M[9,2]))
 # xt7
-@constraint(m,(2*c7*v)/5040==M[2,10]+M[10,2])
+@constraint(m,(2*c7*v)/5040==-(M[2,10]+M[10,2]))
 # xt9
-@constraint(m,-(2*c7*v)/362880==M[2,12]+M[12,2])
+@constraint(m,-(2*c7*v)/362880==-(M[2,12]+M[12,2]))
 # yt
-@constraint(m,- K*c6 - c4*v==M[3,4]+M[4,3])
+@constraint(m,- K*c6 - c4*v==-(M[3,4]+M[4,3]))
 # yt2
-@constraint(m,-(2*c8*v)/2==M[3,5]+M[5,3])
+@constraint(m,-(2*c8*v)/2==-(M[3,5]+M[5,3]))
 # yt3
-@constraint(m,(c4*v)/6==M[3,6]+M[6,3])
+@constraint(m,(c4*v)/6==-(M[3,6]+M[6,3]))
 # yt4
-@constraint(m,(2*c8*v)/24==M[3,7]+M[7,3])
+@constraint(m,(2*c8*v)/24==-(M[3,7]+M[7,3]))
 # yt5
-@constraint(m,-(c4*v)/120==M[3,8]+M[8,3])
+@constraint(m,-(c4*v)/120==-(M[3,8]+M[8,3]))
 # yt6
-@constraint(m,-(2*c8*v)/720==M[3,9]+M[9,3])
+@constraint(m,-(2*c8*v)/720==-(M[3,9]+M[9,3]))
 # yt7
-@constraint(m,(c4*v)/5040==M[3,10]+M[10,3])
+@constraint(m,(c4*v)/5040==-(M[3,10]+M[10,3]))
 # yt9
-@constraint(m,-(c4*v)/362880==M[3,12]+M[12,3])
+@constraint(m,-(c4*v)/362880==-(M[3,12]+M[12,3]))
 
 
 # t
-@constraint(m,c6*v - c1*v - K*c3 + 2*K*c9*u==M[1,4]+M[4,1])
+@constraint(m,c6*v - c1*v - K*c3 + 2*K*c9*u==-(M[1,4]+M[4,1]))
 # t1
-@constraint(m,- 2*K*c9 - c5*v - (c2*v)/2==M[1,5]+M[5,1]+M[4,4])
+@constraint(m,- 2*K*c9 - c5*v - (c2*v)/2==-(M[1,5]+M[5,1]+M[4,4]))
 # t2
-@constraint(m,(c1*v)/6 - (c6*v)/2==M[1,6]+M[6,1]+M[4,5]+M[5,4])
+@constraint(m,(c1*v)/6 - (c6*v)/2==-(M[1,6]+M[6,1]+M[4,5]+M[5,4]))
 # t3
-@constraint(m,(c2*v)/24 + (c5*v)/6==M[1,7]+M[7,1]+M[4,6]+M[5,5]+M[6,4])
+@constraint(m,(c2*v)/24 + (c5*v)/6==-(M[1,7]+M[7,1]+M[4,6]+M[5,5]+M[6,4]))
 # t4
-@constraint(m,(c6*v)/24 - (c1*v)/120==M[1,8]+M[8,1]+M[4,7]+M[5,6]+M[6,5]+M[7,4])
+@constraint(m,(c6*v)/24 - (c1*v)/120==-(M[1,8]+M[8,1]+M[4,7]+M[5,6]+M[6,5]+M[7,4]))
 # t5
-@constraint(m,- (c2*v)/720 - (c5*v)/120==M[1,9]+M[9,1]+M[4,8]+M[5,7]+M[6,6]+M[7,5]+M[8,4])
+@constraint(m,- (c2*v)/720 - (c5*v)/120==-(M[1,9]+M[9,1]+M[4,8]+M[5,7]+M[6,6]+M[7,5]+M[8,4]))
 # t6
-@constraint(m,(c1*v)/5040 - (c6*v)/720==M[1,10]+M[10,1]+M[4,9]+M[5,8]+M[6,7]+M[7,6]+M[8,5]+M[9,4])
+@constraint(m,(c1*v)/5040 - (c6*v)/720==-(M[1,10]+M[10,1]+M[4,9]+M[5,8]+M[6,7]+M[7,6]+M[8,5]+M[9,4]))
 # t7
-@constraint(m,(c5*v)/5040==M[1,11]+M[11,1]+M[4,10]+M[5,9]+M[6,8]+M[7,7]+M[8,6]+M[9,5]+M[10,4])
+@constraint(m,(c5*v)/5040==-(M[1,11]+M[11,1]+M[4,10]+M[5,9]+M[6,8]+M[7,7]+M[8,6]+M[9,5]+M[10,4]))
 # t8
-@constraint(m,-(c1*v)/362880==M[1,12]+M[12,1]+M[4,11]+M[5,10]+M[6,9]+M[7,8]+M[8,7]+M[9,6]+M[10,5]+M[11,4])
+@constraint(m,-(c1*v)/362880==-(M[1,12]+M[12,1]+M[4,11]+M[5,10]+M[6,9]+M[7,8]+M[8,7]+M[9,6]+M[10,5]+M[11,4]))
 # t9
-@constraint(m,-(c5*v)/362880==M[4,12]+M[5,11]+M[6,10]+M[7,9]+M[8,8]+M[9,7]+M[10,6]+M[11,5]+M[12,4])
+@constraint(m,-(c5*v)/362880==-(M[4,12]+M[5,11]+M[6,10]+M[7,9]+M[8,8]+M[9,7]+M[10,6]+M[11,5]+M[12,4]))
 
 
 
@@ -202,7 +201,7 @@ end
 @constraint(m,M[12,12]==0)
 
 
-@constraint(m,test==abs_(c3))
+#@constraint(m,test==abs_(c3))
 
 
 solve(m)
@@ -227,7 +226,7 @@ for n=1:Nbr_obstacle
 		end
 	end
 end
-println(getvalue(test))
+#println(getvalue(test))
 #@printf("Essai %e",getvalue(b))
 if u==pi
 	ustring="pi"

@@ -33,11 +33,11 @@ for i=1:length(y)
     V_value(i)=Vec*C;
 end
 figure('color','white','name',['Evolution of V S_safe selon y u=' num2str(u) ' ' file])
-hold on;plot(y,V_value,'linewidth',2);
+hold on;plot(y,V_value,'k','linewidth',2);
 ylabel('Barrier function V','fontsize',14)
 xlabel('y','fontsize',14)
 
-theta_value=linspace(-pi,pi,200);
+theta_value=linspace(-pi,pi,20);
 if strcmpi(file,'obs_behind')
     Obstacle=[40 90;60 90];
 elseif strcmpi(file,'obs_behind_side')
@@ -61,7 +61,14 @@ end
 figure('color','white','name',['Evolution of V S_unsafe selon y u=' num2str(u) ' ' file])
 hold on
 for i=1:size(Obstacle,1)
-o(i)=plot(theta_value,V(i,:),'linewidth',2)
+    if i==1
+        style=':k';
+    elseif i==2
+        style='+k';
+    else
+        style='*k';
+    end
+o(i)=plot(theta_value,V(i,:),style,'linewidth',2)
 end
 ylabel('Barrier function V','fontsize',14)
 xlabel('\theta','fontsize',16)
@@ -92,20 +99,71 @@ V_dest=Vec*C;
 
 figure('color','white','name',['Evolution of V selon x,y,0 u=' num2str(u) ' ' file])
 
+alphaVal = 0.3;
+h=surf(x,y,V_valeur.','edgecolor','none','FaceAlpha',alphaVal);
 
-
-h=surfc(x,y,V_valeur.','edgecolor','none','FaceAlpha',.3);
 hold on
-h1=plot3(50,100,V_value(1),'.g','markersize',20);
-h2=plot3(Obstacle(:,1),Obstacle(:,2),V_obst,'.r','markersize',20);
-h3=plot3(Destination(1),Destination(2),V_dest,'.b','markersize',20);
+h1=plot3(50,100,V_value(1),'.k','markersize',20);
+h2=plot3(Obstacle(:,1),Obstacle(:,2),V_obst,'.k','markersize',25);
+h3=plot3(Destination(1),Destination(2),V_dest,'*k','markersize',15);
 xlabel('x','fontsize',14)
 ylabel('y','fontsize',14)
 zlabel('V(s)','fontsize',14)
-colormap([0 0 0.7;0.7 0 0])
-caxis([-5 5])
+c_map=colormap([0.1 0.1 0.1;0.5 0.5 0.5])
+%colormap winter;
+caxis([-5 5]*1e-5)
+%legend('>0','<0')
 leg=legend([h1 h2 h3],{'Start','Obstacles','Destination'},'location','best');
 view(gca,[-81.5 38]);
 leg.FontSize=14;
+% cb = colorbar(gca); %// This time we need a handle to the colorbar
+% cb.Visible='off';
+% annotation('textbox',...
+%      [cb.Position(1:2) [cb.Position(3) 0.5*cb.Position(4)]],...
+%      'FitBoxToText','off',...
+%      'EdgeColor',[1 1 1],...
+%      'BackgroundColor',(1-alphaVal)*[1 1 1]+alphaVal*[0.1 0.1 0.1]);
+
+% cb.Ticks = (hSp.CLim(1):hSp.CLim(2))+0.5; %// Set the tick positions
+% cb.TickLabels = fakeNames; %// Set the tick strings
+
+
+a = get(gca, 'ZLim');
+        
+% Always put contour below the plot.
+zpos = a(1);
+possible_puissance=[1e-8 1e-7 1e-6 1e-5 1e-4 1e-3 1e-2 1e-1 1 1e1 1e2 1e3];
+puissance_ok=0;
+i=length(possible_puissance);
+Max_valueee=max(max(V_valeur))
+while puissance_ok~=1
+if possible_puissance(i)>Max_valueee
+    i=i-1;
+else
+    puissance=possible_puissance(i-1);
+    puissance_ok=1;
+end
+end
+puissance
+%puissance=1e-6;
+min(min(V_valeur));
+Borne_bas=round(min(min(1/puissance*V_valeur)))
+max(max(V_valeur));
+Borne_haut=round(max(max(1/puissance*V_valeur)))
+number_curve=10;
+dcurve1=round((-2*Borne_bas)/number_curve);
+dcurve2=round((2*Borne_haut)/number_curve);
+level=[(Borne_bas:dcurve1:0-puissance) 0 (dcurve1:dcurve1:Borne_haut)]
+% Get D contour data
+[C, hh] = contour3(x,y,V_valeur.',number_curve,'LineColor','k','LevelList',puissance*level);
+clabel(C,hh)
+% % size zpos to match the data
+% for i = 1 : length(hh)
+%     zz = get(hh(i), 'ZData');
+%     set(hh(i), 'ZData', zpos * ones(size(zz)));
+% end
+
+% %[C,h]=contour(x,y,V_valeur.',8,'LineColor','k','LevelList',1e-6*(-15:1:15));
+
 
 end
