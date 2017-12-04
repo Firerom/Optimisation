@@ -151,11 +151,13 @@ Borne_bas=round(min(min(1/puissance*V_valeur)))
 max(max(V_valeur));
 Borne_haut=round(max(max(1/puissance*V_valeur)))
 number_curve=10;
-dcurve1=round((-2*Borne_bas)/number_curve);
-dcurve2=round((2*Borne_haut)/number_curve);
+dcurve1=abs(round((-2*Borne_bas)/number_curve))
+dcurve2=abs(round((2*Borne_haut)/number_curve))
 level=[(Borne_bas:dcurve1:0-puissance) 0 (dcurve1:dcurve1:Borne_haut)]
 % Get D contour data
-[C, hh] = contour3(x,y,V_valeur.',number_curve,'LineColor','k','LevelList',puissance*level);
+[C, hh] = contour3(x,y,V_valeur.',number_curve);
+hh.LineColor='k';
+hh.LevelList=puissance*level;
 clabel(C,hh)
 % % size zpos to match the data
 % for i = 1 : length(hh)
