@@ -133,14 +133,15 @@ a = get(gca, 'ZLim');
 % Always put contour below the plot.
 zpos = a(1);
 possible_puissance=[1e-10 1e-9 1e-8 1e-7 1e-6 1e-5 1e-4 1e-3 1e-2 1e-1 1 1e1 1e2 1e3];
+Start_possible_puissance=1e3;
 puissance_ok=0;
 i=length(possible_puissance);
-Max_valueee=max(max(V_valeur))
+Max_valueee=abs(max(max(V_valeur)))
 while puissance_ok~=1
-if possible_puissance(i)>Max_valueee
-    i=i-1;
+if Start_possible_puissance>Max_valueee
+    Start_possible_puissance=Start_possible_puissance/10;
 else
-    puissance=possible_puissance(i-1);
+    puissance=Start_possible_puissance/10;
     puissance_ok=1;
 end
 end
@@ -152,8 +153,14 @@ max(max(V_valeur));
 Borne_haut=round(max(max(1/puissance*V_valeur)))
 number_curve=10;
 dcurve1=abs(round((-2*Borne_bas)/number_curve))
+if dcurve1==0
+    dcurve1=1;
+end
 dcurve2=abs(round((2*Borne_haut)/number_curve))
-level=[(Borne_bas:dcurve1:0-puissance) 0 (dcurve1:dcurve1:Borne_haut)]
+if dcurve2==0
+    dcurve2=1;
+end
+level=[(Borne_bas:dcurve1:0-puissance) 0 (dcurve1:dcurve2:Borne_haut)]
 % Get D contour data
 [C, hh] = contour3(x,y,V_valeur.',number_curve);
 hh.LineColor='k';
