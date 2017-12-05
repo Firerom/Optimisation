@@ -89,83 +89,80 @@ end
 
 #Initial configuration of the drone
 
-
-
-#V is minimum degree 2 must be verified or we must impose one more constraint
-#@constraint(m, -(c7+c8+c9)>=0.001)
-
 #First constraint initially in S_safe
 @constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2+small_epsilon<=b)
 
 #Second constraint with the obstacles (M_obs already SDP), for each of them
 for i=1:Nbr_obstacle
-	@constraint(m, M_obs[i,1,1]==c0+c1*Data1.obstacles[i][1]+c2*Data1.obstacles[i][2]+c4*Data1.obstacles[i][1]*Data1.obstacles[i][2]+c7*Data1.obstacles[i][1]^2+c8*Data1.obstacles[i][2]^2-small_epsilon)
-	@constraint(m, 2*M_obs[i,1,2]==c3+c5*Data1.obstacles[i][1]+c6*Data1.obstacles[i][2])
+	x_o=Data1.obstacles[i][1]
+	y_o=Data1.obstacles[i][2]
+	@constraint(m, M_obs[i,1,1]==c0+c1*x_o+c2*y_o+c4*x_o*y_o+c7*x_o^2+c8*y_o^2-b-small_epsilon)
+	@constraint(m, 2*M_obs[i,1,2]==c3+c5*x_o+c6*y_o)
 	@constraint(m, M_obs[i,2,2]==c9)
 end
 
 #third constraint V_dot
 
 # 1
-@constraint(m,c2*v + K*c3*u==-M[1,1])
+@constraint(m,c2*v + K*c3*u==-(M[1,1]))
 # x
-@constraint(m,c4*v + K*c5*u==-(M[1,2]+M[2,1]))
+@constraint(m,c4*v + K*c5*u==-(2*M[1,2]))
 # y
-@constraint(m,2*c8*v + K*c6*u==-(M[1,3]+M[3,1]))
+@constraint(m,2*c8*v + K*c6*u==-(2*M[1,3]))
 # xt
-@constraint(m,- K*c5 - 2*c7*v==-(M[2,4]+M[4,2]))
+@constraint(m,- K*c5 - 2*c7*v==-(2*M[2,4]))
 # xt2
-@constraint(m,-(c4*v)/2==-(M[2,5]+M[5,2]))
+@constraint(m,-(c4*v)/2==-(2*M[2,5]))
 # xt3
-@constraint(m,(2*c7*v)/6==-(M[2,6]+M[6,2]))
+@constraint(m,(2*c7*v)/6==-(2*M[2,6]))
 # xt4
-@constraint(m,(c4*v)/24==-(M[2,7]+M[7,2]))
+@constraint(m,(c4*v)/24==-(2*M[2,7]))
 # xt5
-@constraint(m,-(2*c7*v)/120==-(M[2,8]+M[8,2]))
+@constraint(m,-(2*c7*v)/120==-(2*M[2,8]))
 # xt6
-@constraint(m,-(c4*v)/720==-(M[2,9]+M[9,2]))
+@constraint(m,-(c4*v)/720==-(2*M[2,9]))
 # xt7
-@constraint(m,(2*c7*v)/5040==-(M[2,10]+M[10,2]))
+@constraint(m,(2*c7*v)/5040==-(2*M[2,10]))
 # xt9
-@constraint(m,-(2*c7*v)/362880==-(M[2,12]+M[12,2]))
+@constraint(m,-(2*c7*v)/362880==-(2*M[2,12]))
 # yt
-@constraint(m,- K*c6 - c4*v==-(M[3,4]+M[4,3]))
+@constraint(m,- K*c6 - c4*v==-(2*M[3,4]))
 # yt2
-@constraint(m,-(2*c8*v)/2==-(M[3,5]+M[5,3]))
+@constraint(m,-(2*c8*v)/2==-(2*M[3,5]))
 # yt3
-@constraint(m,(c4*v)/6==-(M[3,6]+M[6,3]))
+@constraint(m,(c4*v)/6==-(2*M[3,6]))
 # yt4
-@constraint(m,(2*c8*v)/24==-(M[3,7]+M[7,3]))
+@constraint(m,(2*c8*v)/24==-(2*M[3,7]))
 # yt5
-@constraint(m,-(c4*v)/120==-(M[3,8]+M[8,3]))
+@constraint(m,-(c4*v)/120==-(2*M[3,8]))
 # yt6
-@constraint(m,-(2*c8*v)/720==-(M[3,9]+M[9,3]))
+@constraint(m,-(2*c8*v)/720==-(2*M[3,9]))
 # yt7
-@constraint(m,(c4*v)/5040==-(M[3,10]+M[10,3]))
+@constraint(m,(c4*v)/5040==-(2*M[3,10]))
 # yt9
-@constraint(m,-(c4*v)/362880==-(M[3,12]+M[12,3]))
+@constraint(m,-(c4*v)/362880==-(2*M[3,12]))
 
 
 # t
-@constraint(m,c6*v - c1*v - K*c3 + 2*K*c9*u==-(M[1,4]+M[4,1]))
-# t1
-@constraint(m,- 2*K*c9 - c5*v - (c2*v)/2==-(M[1,5]+M[5,1]+M[4,4]))
+@constraint(m,c6*v - c1*v - K*c3 + 2*K*c9*u==-(2*M[1,4]))
 # t2
-@constraint(m,(c1*v)/6 - (c6*v)/2==-(M[1,6]+M[6,1]+M[4,5]+M[5,4]))
+@constraint(m,- 2*K*c9 - c5*v - (c2*v)/2==-(2*M[1,5]+M[4,4]))
 # t3
-@constraint(m,(c2*v)/24 + (c5*v)/6==-(M[1,7]+M[7,1]+M[4,6]+M[5,5]+M[6,4]))
+@constraint(m,(c1*v)/6 - (c6*v)/2==-(2*M[1,6]+M[4,5]+M[4,5]))
 # t4
-@constraint(m,(c6*v)/24 - (c1*v)/120==-(M[1,8]+M[8,1]+M[4,7]+M[5,6]+M[6,5]+M[7,4]))
+@constraint(m,(c2*v)/24 + (c5*v)/6==-(2*M[1,7]+M[4,6]+M[5,5]+M[4,6]))
 # t5
-@constraint(m,- (c2*v)/720 - (c5*v)/120==-(M[1,9]+M[9,1]+M[4,8]+M[5,7]+M[6,6]+M[7,5]+M[8,4]))
+@constraint(m,(c6*v)/24 - (c1*v)/120==-(2*M[1,8]+M[4,7]+M[5,6]+M[5,6]+M[4,7]))
 # t6
-@constraint(m,(c1*v)/5040 - (c6*v)/720==-(M[1,10]+M[10,1]+M[4,9]+M[5,8]+M[6,7]+M[7,6]+M[8,5]+M[9,4]))
+@constraint(m,- (c2*v)/720 - (c5*v)/120==-(2*M[1,9]+M[4,8]+M[5,7]+M[6,6]+M[5,7]+M[4,8]))
 # t7
-@constraint(m,(c5*v)/5040==-(M[1,11]+M[11,1]+M[4,10]+M[5,9]+M[6,8]+M[7,7]+M[8,6]+M[9,5]+M[10,4]))
+@constraint(m,(c1*v)/5040 - (c6*v)/720==-(2*M[1,10]+M[4,9]+M[5,8]+M[6,7]+M[6,7]+M[5,8]+M[4,9]))
 # t8
-@constraint(m,-(c1*v)/362880==-(M[1,12]+M[12,1]+M[4,11]+M[5,10]+M[6,9]+M[7,8]+M[8,7]+M[9,6]+M[10,5]+M[11,4]))
+@constraint(m,(c5*v)/5040==-(2*M[1,11]+M[4,10]+M[5,9]+M[6,8]+M[7,7]+M[6,8]+M[5,9]+M[4,10]))
 # t9
-@constraint(m,-(c5*v)/362880==-(M[4,12]+M[5,11]+M[6,10]+M[7,9]+M[8,8]+M[9,7]+M[10,6]+M[11,5]+M[12,4]))
+@constraint(m,-(c1*v)/362880==-(2*M[1,12]+M[4,11]+M[5,10]+M[6,9]+M[7,8]+M[7,8]+M[6,9]+M[5,10]+M[4,11]))
+# t10
+@constraint(m,-(c5*v)/362880==-(M[4,12]+M[5,11]+M[6,10]+M[7,9]+M[8,8]+M[7,9]+M[6,10]+M[5,11]+M[4,12]))
 
 
 
@@ -179,22 +176,23 @@ end
 # y2: 0
 @constraint(m,0==M[3,3])
 # xy: 0
-@constraint(m,0==M[2,3]+M[3,2])
+@constraint(m,0==2*M[2,3])
+
 
 #theta11:0
-@constraint(m,M[5,12]+M[6,11]+M[7,10]+M[8,9]+M[9,8]+M[10,7]+M[11,6]+M[12,5]==0)
+@constraint(m,M[5,12]+M[6,11]+M[7,10]+M[8,9]+M[8,9]+M[7,10]+M[6,11]+M[5,12]==0)
 #theta12:0
-@constraint(m,M[6,12]+M[7,11]+M[8,10]+M[9,9]+M[10,8]+M[11,7]+M[12,6]==0)
+@constraint(m,M[6,12]+M[7,11]+M[8,10]+M[9,9]+M[8,10]+M[7,11]+M[6,12]==0)
 #theta13:0
-@constraint(m,M[7,12]+M[8,11]+M[9,10]+M[10,9]+M[11,8]+M[12,7]==0)
+@constraint(m,M[7,12]+M[8,11]+M[9,10]+M[9,10]+M[8,11]+M[7,12]==0)
 #theta14:0
-@constraint(m,M[8,12]+M[9,11]+M[10,10]+M[11,9]+M[12,8]==0)
+@constraint(m,M[8,12]+M[9,11]+M[10,10]+M[9,11]+M[8,12]==0)
 #theta15:0
-@constraint(m,M[9,12]+M[10,11]+M[11,10]+M[12,9]==0)
+@constraint(m,M[9,12]+M[10,11]+M[10,11]+M[9,12]==0)
 #theta16:0
-@constraint(m,M[10,12]+M[11,11]+M[12,10]==0)
+@constraint(m,M[10,12]+M[11,11]+M[10,12]==0)
 #theta17:0
-@constraint(m,M[11,12]+M[12,11]==0)
+@constraint(m,M[11,12]+M[11,12]==0)
 #theta18:0
 @constraint(m,M[12,12]==0)
 
