@@ -4,6 +4,7 @@ include("optimisation1.jl")
 fichier="obs_behind"
 Data1=loadDataFromFile(fichier)
 small_epsilon=0.000001
+objectif_without=-9999
 #start: (50,100,0) [x,y,theta]
 #destination: (50,190) [x,y]
 #obstacle: x_obstacle1=Data1.obstacles[1][1]
@@ -13,7 +14,7 @@ small_epsilon=0.000001
 #le nombre d'obstacle
 Nbr_obstacle=size(Data1.obstacles,1)
 
-u=pi #test for pi after
+u=0 #test for pi after
 v=6
 K=0.2
 b=0
@@ -65,7 +66,11 @@ m = Model(solver=MosekSolver())
 #matrix fro the V_s sontaint
 @variable(m, M_s[1:3,1:3], Symmetric)
 @variable(m,h)
-@objective(m, Min, h)
+if abs(objectif_without)<1e-5
+	@objective(m, Min, h)
+else
+	h=objectif_without
+end
 #h=-9999999999999
 
 @SDconstraint(m,M<=0)
@@ -119,7 +124,7 @@ end
 #y
 @constraint(m, 2*M[1,3]==(2*c6*v + c5*w + K*c8*u))
 #t
-@constraint(m, 2*M[1,4]==(2*c6*v + c5*w + K*c8*u))
+@constraint(m, 2*M[1,4]==(c8*v + c7*w + 2*K*c9*u))
 #x^2
 @constraint(m, 2*M[1,6]+M[2,2]==(c11*v + 3*c10*w + K*c14*u))
 #y^2
@@ -211,10 +216,11 @@ if u==pi
 else
 	ustring="0"
 end
-file_name=string("Q4_",ustring,"_",fichier,".txt")
-ci=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
+file_name=string("Result_Q4_SDP/Q4_",ustring,"_",fichier,"_",h,".txt")
+ci=getvalue([c0 c1 c2 c3   c4   c5  c6  c7  c8  c9   c10 c11  c12  c13 c14   c15  c16   c17 c18   c19  c20 c21  c22    c23  c24 c25   c26    c27    c28   c29     c30    c31     c32   c33   c34])
 writedlm(file_name, ci)
 
+println(getvalue([c0 c1 c2 c3   c4   c5  c6  c7  c8  c9   c10 c11  c12  c13 c14   c15  c16   c17 c18   c19  c20 c21  c22    c23  c24 c25   c26    c27    c28   c29     c30    c31     c32   c33   c34]))
 
 
 ;
