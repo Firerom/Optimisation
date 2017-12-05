@@ -4,7 +4,7 @@ include("optimisation1.jl")
 fichier="obs_behind_side"
 Data1=loadDataFromFile(fichier)
 small_epsilon=0.000001
-objectif_without=-999999
+objectif_without=0
 #start: (50,100,0) [x,y,theta]
 #destination: (50,190) [x,y]
 #obstacle: x_obstacle1=Data1.obstacles[1][1]
