@@ -62,3 +62,21 @@ function generateData(numObs::Int)::Optinum.Data
 
 	return Optinum.Data(start, destination, obstacles)
 end
+
+function obstacle_near(fichier,s_actual)
+    Data1=loadDataFromFile(fichier)
+    Rayon=20    #m
+    obstacles_new=[0 0]
+    for i=1:1:Nbr_obstacle
+        x=Data1.obstacles[i][1]
+    	y=Data1.obstacles[i][2]
+        println(x)
+        println(y)
+        value=(x-s_actual[1])^2+(y-s_actual[2])^2<=Rayon^2
+        println(value)
+        if((x-s_actual[1])^2+(y-s_actual[2])^2<=Rayon^2)
+            obstacles_new=[obstacles_new; x y]
+        end
+    end
+    return obstacles_new[2:size(obstacles_new,1),:]
+end
