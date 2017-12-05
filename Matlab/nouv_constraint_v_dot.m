@@ -141,3 +141,16 @@ for i=Sum-Taille:1:Taille
 end
 fprintf(')\n')
 end
+fprintf('\n\n')
+for l=1:12
+for i=1:11
+    if i>=l
+        valeur=i+1;
+    else
+        valeur=i;
+    end
+    fprintf('@constraint(m,aux[%d,%d]>=M[%d,%d]\n',l,i,l,valeur);
+    fprintf('@constraint(m,aux[%d,%d]>=-M[%d,%d]\n',l,i,l,valeur);    
+end
+fprintf('\n')
+end

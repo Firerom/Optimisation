@@ -58,7 +58,6 @@ for n=1:Nbr_obstacle
 		end
 	end
 #@SDconstraint(m,M_obs[n,:,:]>=0)
-
 @constraint(m,(gain*M_obs[n,1,1])>=gain*M_obs[n,1,2])
 @constraint(m,(gain*M_obs[n,1,1])>=-gain*M_obs[n,1,2])
 @constraint(m,(gain*M_obs[n,2,2])>=gain*M_obs[n,2,1])

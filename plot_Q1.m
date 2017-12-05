@@ -13,7 +13,7 @@ for i=1:length(file_data)
             u='pi';
         end
         file=file_data{i}
-        C=load([Dossier '/Q1_' u '_' file '.txt'])'
+        C=load([Dossier '/Q1_' u '_' file '.txt']).'
         plot_V(C,u,file)
     end
 end
