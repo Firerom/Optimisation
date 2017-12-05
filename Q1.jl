@@ -59,11 +59,7 @@ theta_i=Data1.start[3];
 #@constraint(m, -(c7+c8+c9)>=0.001)
 
 #First constraint initially in S_safe
-<<<<<<< HEAD
-@constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2<=b-small_epsilon)
-=======
 @constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2+small_epsilon<=b)
->>>>>>> 1d261cd5de9f51439be5466b4fa3032392a39b86
 
 #Second constraint with the obstacles (M_obs already SDP), for each of them
 for i=1:Nbr_obstacle
