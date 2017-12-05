@@ -102,7 +102,7 @@ theta_i=Data1.start[3];
 #First constraint initially in S_safe
 @constraint(m, c34*theta_i^4 + c32*theta_i^3*x_i + c33*theta_i^3*y_i + c19*theta_i^3 + c29*theta_i^2*x_i^2 + c30*theta_i^2*x_i*y_i + c17*theta_i^2*x_i + c31*theta_i^2*y_i^2 + c18*theta_i^2*y_i + c9*theta_i^2 + c25*theta_i*x_i^3
 + c26*theta_i*x_i^2*y_i + c14*theta_i*x_i^2 + c27*theta_i*x_i*y_i^2 + c15*theta_i*x_i*y_i + c7*theta_i*x_i + c28*theta_i*y_i^3 + c16*theta_i*y_i^2 + c8*theta_i*y_i + c3*theta_i + c20*x_i^4 + c21*x_i^3*y_i + c10*x_i^3 + c22*x_i^2*y_i^2
-+ c11*x_i^2*y_i + c4*x_i^2 + c23*x_i*y_i^3 + c12*x_i*y_i^2 + c5*x_i*y_i + c1*x_i + c24*y_i^4 + c13*y_i^3 + c6*y_i^2 + c2*y_i + c0<=b)
++ c11*x_i^2*y_i + c4*x_i^2 + c23*x_i*y_i^3 + c12*x_i*y_i^2 + c5*x_i*y_i + c1*x_i + c24*y_i^4 + c13*y_i^3 + c6*y_i^2 + c2*y_i + c0<=b-small_epsilon)
 #Second constraint with the obstacles (M_obs already SDP), for each of them
 for i=1:Nbr_obstacle
 	x_o=Data1.obstacles[i][1]
