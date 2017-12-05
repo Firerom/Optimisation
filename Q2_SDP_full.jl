@@ -81,7 +81,7 @@ theta_i=Data1.start[3];
 #@constraint(m, -(c7+c8+c9)>=0.001)
 
 #First constraint initially in S_safe
-@constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2<=b)
+@constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2+small_epsilon<=b)
 
 #Second constraint with the obstacles (M_obs already SDP), for each of them
 for i=1:Nbr_obstacle
@@ -214,7 +214,7 @@ if u==pi
 else
 	ustring="0"
 end
-file_name=string("Q2_",ustring,"_",fichier,".txt")
+file_name=string("Result_Q2/Q2_",ustring,"_",fichier,".txt")
 ci=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
 writedlm(file_name, ci)
 ;
