@@ -156,3 +156,11 @@ function SDP_barrier(obstacle,s_actual,u)
     C=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
     return C
 end
+
+function find_index(matrix,element)
+	for i=1:1:length(matrix)
+		if abs(abs(matrix[i])-element)<1e-5
+			return i
+		end
+	end
+end
