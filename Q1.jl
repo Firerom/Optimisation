@@ -1,5 +1,5 @@
 include("optimisation1.jl")
-fichier="obs_behind_side"
+fichier="obs_behind"
 Data1=loadDataFromFile(fichier)
 small_epsilon=0.000001
 #start: (50,100,0) [x,y,theta]
@@ -32,7 +32,7 @@ m = Model(solver=MosekSolver())
 @variable(m, M_obs[1:Nbr_obstacle,1:2,1:2])
 #matrix for the Vdot constraint
 @variable(m,M[1:12,1:12], Symmetric)
-@SDconstraint(m,M<=0)
+@SDconstraint(m,M>=0)
 
 # each matrix obstacle must be symmetric and SDP
 for n=1:Nbr_obstacle
@@ -73,65 +73,65 @@ end
 #third constraint V_dot
 
 # 1
-@constraint(m,c2*v + K*c3*u==M[1,1])
+@constraint(m,c2*v + K*c3*u==-(M[1,1]))
 # x
-@constraint(m,c4*v + K*c5*u==2*M[1,2])
+@constraint(m,c4*v + K*c5*u==-(2*M[1,2]))
 # y
-@constraint(m,2*c8*v + K*c6*u==2*M[1,3])
+@constraint(m,2*c8*v + K*c6*u==-(2*M[1,3]))
 # xt
-@constraint(m,- K*c5 - 2*c7*v==2*M[2,4])
+@constraint(m,- K*c5 - 2*c7*v==-(2*M[2,4]))
 # xt2
-@constraint(m,-(c4*v)/2==2*M[2,5])
+@constraint(m,-(c4*v)/2==-(2*M[2,5]))
 # xt3
-@constraint(m,(2*c7*v)/6==2*M[2,6])
+@constraint(m,(2*c7*v)/6==-(2*M[2,6]))
 # xt4
-@constraint(m,(c4*v)/24==2*M[2,7])
+@constraint(m,(c4*v)/24==-(2*M[2,7]))
 # xt5
-@constraint(m,-(2*c7*v)/120==2*M[2,8])
+@constraint(m,-(2*c7*v)/120==-(2*M[2,8]))
 # xt6
-@constraint(m,-(c4*v)/720==2*M[2,9])
+@constraint(m,-(c4*v)/720==-(2*M[2,9]))
 # xt7
-@constraint(m,(2*c7*v)/5040==2*M[2,10])
+@constraint(m,(2*c7*v)/5040==-(2*M[2,10]))
 # xt9
-@constraint(m,-(2*c7*v)/362880==2*M[2,12])
+@constraint(m,-(2*c7*v)/362880==-(2*M[2,12]))
 # yt
-@constraint(m,- K*c6 - c4*v==2*M[3,4])
+@constraint(m,- K*c6 - c4*v==-(2*M[3,4]))
 # yt2
-@constraint(m,-(2*c8*v)/2==2*M[3,5])
+@constraint(m,-(2*c8*v)/2==-(2*M[3,5]))
 # yt3
-@constraint(m,(c4*v)/6==2*M[3,6])
+@constraint(m,(c4*v)/6==-(2*M[3,6]))
 # yt4
-@constraint(m,(2*c8*v)/24==2*M[3,7])
+@constraint(m,(2*c8*v)/24==-(2*M[3,7]))
 # yt5
-@constraint(m,-(c4*v)/120==2*M[3,8])
+@constraint(m,-(c4*v)/120==-(2*M[3,8]))
 # yt6
-@constraint(m,-(2*c8*v)/720==2*M[3,9])
+@constraint(m,-(2*c8*v)/720==-(2*M[3,9]))
 # yt7
-@constraint(m,(c4*v)/5040==2*M[3,10])
+@constraint(m,(c4*v)/5040==-(2*M[3,10]))
 # yt9
-@constraint(m,-(c4*v)/362880==2*M[3,12])
+@constraint(m,-(c4*v)/362880==-(2*M[3,12]))
 
 
 # t
-@constraint(m,c6*v - c1*v - K*c3 + 2*K*c9*u==2*M[1,4])
+@constraint(m,c6*v - c1*v - K*c3 + 2*K*c9*u==-(2*M[1,4]))
 # t2
-@constraint(m,- 2*K*c9 - c5*v - (c2*v)/2==2*M[1,5]+M[4,4])
+@constraint(m,- 2*K*c9 - c5*v - (c2*v)/2==-(2*M[1,5]+M[4,4]))
 # t3
-@constraint(m,(c1*v)/6 - (c6*v)/2==2*M[1,6]+M[4,5]+M[4,5])
+@constraint(m,(c1*v)/6 - (c6*v)/2==-(2*M[1,6]+M[4,5]+M[4,5]))
 # t4
-@constraint(m,(c2*v)/24 + (c5*v)/6==2*M[1,7]+M[4,6]+M[5,5]+M[4,6])
+@constraint(m,(c2*v)/24 + (c5*v)/6==-(2*M[1,7]+M[4,6]+M[5,5]+M[4,6]))
 # t5
-@constraint(m,(c6*v)/24 - (c1*v)/120==2*M[1,8]+M[4,7]+M[5,6]+M[5,6]+M[4,7])
+@constraint(m,(c6*v)/24 - (c1*v)/120==-(2*M[1,8]+M[4,7]+M[5,6]+M[5,6]+M[4,7]))
 # t6
-@constraint(m,- (c2*v)/720 - (c5*v)/120==2*M[1,9]+M[4,8]+M[5,7]+M[6,6]+M[5,7]+M[4,8])
+@constraint(m,- (c2*v)/720 - (c5*v)/120==-(2*M[1,9]+M[4,8]+M[5,7]+M[6,6]+M[5,7]+M[4,8]))
 # t7
-@constraint(m,(c1*v)/5040 - (c6*v)/720==2*M[1,10]+M[4,9]+M[5,8]+M[6,7]+M[6,7]+M[5,8]+M[4,9])
+@constraint(m,(c1*v)/5040 - (c6*v)/720==-(2*M[1,10]+M[4,9]+M[5,8]+M[6,7]+M[6,7]+M[5,8]+M[4,9]))
 # t8
-@constraint(m,(c5*v)/5040==2*M[1,11]+M[4,10]+M[5,9]+M[6,8]+M[7,7]+M[6,8]+M[5,9]+M[4,10])
+@constraint(m,(c5*v)/5040==-(2*M[1,11]+M[4,10]+M[5,9]+M[6,8]+M[7,7]+M[6,8]+M[5,9]+M[4,10]))
 # t9
-@constraint(m,-(c1*v)/362880==2*M[1,12]+M[4,11]+M[5,10]+M[6,9]+M[7,8]+M[7,8]+M[6,9]+M[5,10]+M[4,11])
+@constraint(m,-(c1*v)/362880==-(2*M[1,12]+M[4,11]+M[5,10]+M[6,9]+M[7,8]+M[7,8]+M[6,9]+M[5,10]+M[4,11]))
 # t10
-@constraint(m,-(c5*v)/362880==M[4,12]+M[5,11]+M[6,10]+M[7,9]+M[8,8]+M[7,9]+M[6,10]+M[5,11]+M[4,12])
+@constraint(m,-(c5*v)/362880==-(M[4,12]+M[5,11]+M[6,10]+M[7,9]+M[8,8]+M[7,9]+M[6,10]+M[5,11]+M[4,12]))
 
 
 
@@ -193,7 +193,7 @@ if u==pi
 else
 	ustring="0"
 end
-file_name=string("Q1_",ustring,"_",fichier,".txt")
+file_name=string("Result_Q1/Q1_",ustring,"_",fichier,".txt")
 ci=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
 writedlm(file_name, ci)
 
