@@ -94,10 +94,10 @@ for i=1:8
 		@constraint(m,M[i,j]-M[j,i]==0)
 		@constraint(m,Ab_dot[i,j,1]-2*M[i,j]==0)
 		@constraint(m,Ab_dot[i,j,2]-(M[i,i]-M[j,j])==0)
-		@constraint(m,norm(Ab_dot[i,j,:])  <=-(M[i,i]+M[j,j]) )
+		@constraint(m,norm(Ab_dot[i,j,:])  <=(M[i,i]+M[j,j]) )
 	end
 	#element diagonaux inférieur à zero
-	@constraint(m,M[i,i]<=0)
+	@constraint(m,M[i,i]>=0)
 end
 
 
@@ -109,9 +109,9 @@ for i=1:3
 		@constraint(m,M_s[i,j]-M_s[j,i]==0)
 		@constraint(m,Ab_s[i,j,1]-2*M_s[i,j]==0)
 		@constraint(m,Ab_s[i,j,2]-(M_s[i,i]-M_s[j,j])==0)
-		@constraint(m,norm(Ab_s[i,j,:])  <=-(M_s[i,i]+M_s[j,j]) )
+		@constraint(m,norm(Ab_s[i,j,:])  <=(M_s[i,i]+M_s[j,j]) )
 	end
-@constraint(m,M_s[i,i]<=0)
+@constraint(m,M_s[i,i]>=0)
 end
 # V(s)
 # c0 c1 c2 c3   c4   c5  c6  c7  c8  c9   c10 c11  c12  c13 c14   c15  c16   c17
@@ -131,7 +131,7 @@ theta_i=Data1.start[3];
 #First constraint initially in S_safe
 @constraint(m, c34*theta_i^4 + c32*theta_i^3*x_i + c33*theta_i^3*y_i + c19*theta_i^3 + c29*theta_i^2*x_i^2 + c30*theta_i^2*x_i*y_i + c17*theta_i^2*x_i + c31*theta_i^2*y_i^2 + c18*theta_i^2*y_i + c9*theta_i^2 + c25*theta_i*x_i^3
 + c26*theta_i*x_i^2*y_i + c14*theta_i*x_i^2 + c27*theta_i*x_i*y_i^2 + c15*theta_i*x_i*y_i + c7*theta_i*x_i + c28*theta_i*y_i^3 + c16*theta_i*y_i^2 + c8*theta_i*y_i + c3*theta_i + c20*x_i^4 + c21*x_i^3*y_i + c10*x_i^3 + c22*x_i^2*y_i^2
-+ c11*x_i^2*y_i + c4*x_i^2 + c23*x_i*y_i^3 + c12*x_i*y_i^2 + c5*x_i*y_i + c1*x_i + c24*y_i^4 + c13*y_i^3 + c6*y_i^2 + c2*y_i + c0<=b)
++ c11*x_i^2*y_i + c4*x_i^2 + c23*x_i*y_i^3 + c12*x_i*y_i^2 + c5*x_i*y_i + c1*x_i + c24*y_i^4 + c13*y_i^3 + c6*y_i^2 + c2*y_i + c0<=b-small_epsilon)
 #Second constraint with the obstacles (M_obs already SDP), for each of them
 for i=1:Nbr_obstacle
 	x_o=Data1.obstacles[i][1]
@@ -147,45 +147,45 @@ end
 
 #third constraint V_dot
 #1
-@constraint(m, M[1,1]==(c2*v + c1*w + K*c3*u))
+@constraint(m, -M[1,1]==(c2*v + c1*w + K*c3*u))
 #x
-@constraint(m, 2*M[1,2]==(c5*v + 2*c4*w + K*c7*u))
+@constraint(m, -2*M[1,2]==(c5*v + 2*c4*w + K*c7*u))
 #y
-@constraint(m, 2*M[1,3]==(2*c6*v + c5*w + K*c8*u))
+@constraint(m, -2*M[1,3]==(2*c6*v + c5*w + K*c8*u))
 #t
-@constraint(m, 2*M[1,4]==(2*c6*v + c5*w + K*c8*u))
+@constraint(m, -2*M[1,4]==(2*c6*v + c5*w + K*c8*u))
 #x^2
-@constraint(m, 2*M[1,6]+M[2,2]==(c11*v + 3*c10*w + K*c14*u))
+@constraint(m, -(2*M[1,6]+M[2,2])==(c11*v + 3*c10*w + K*c14*u))
 #y^2
-@constraint(m, 2*M[1,7]+M[3,3]==  (3*c13*v + c12*w + K*c16*u))
+@constraint(m, -(2*M[1,7]+M[3,3])==  (3*c13*v + c12*w + K*c16*u))
 #t^2
-@constraint(m, 2*M[1,8]+M[4,4]== (c18*v + c17*w + 3*K*c19*u))
+@constraint(m, -(2*M[1,8]+M[4,4])== (c18*v + c17*w + 3*K*c19*u))
 #x*y
-@constraint(m, 2*M[1,5]+2*M[2,3]== (2*c12*v + 2*c11*w + K*c15*u))
+@constraint(m, -(2*M[1,5]+2*M[2,3])== (2*c12*v + 2*c11*w + K*c15*u))
 #t*x
-@constraint(m, 2*M[2,4]== (c15*v + 2*c14*w + 2*K*c17*u))
+@constraint(m, -2*M[2,4]== (c15*v + 2*c14*w + 2*K*c17*u))
 #t*y
-@constraint(m, 2*M[3,4]== (2*c16*v + c15*w + 2*K*c18*u))
+@constraint(m, -2*M[3,4]== (2*c16*v + c15*w + 2*K*c18*u))
 #x^3
-@constraint(m, 2*M[2,6]== (c21*v + 4*c20*w + K*c25*u))
+@constraint(m, -2*M[2,6]== (c21*v + 4*c20*w + K*c25*u))
 #y^3
-@constraint(m, 2*M[3,7]==(4*c24*v + c23*w + K*c28*u))
+@constraint(m, -2*M[3,7]==(4*c24*v + c23*w + K*c28*u))
 #x*y^2
-@constraint(m, 2*M[2,7]+M[3,5]== (3*c23*v + 2*c22*w + K*c27*u))
+@constraint(m, -2*M[2,7]+M[3,5]== (3*c23*v + 2*c22*w + K*c27*u))
 #t^2*x
-@constraint(m, 2*M[2,8]==(c30*v + 2*c29*w + 3*K*c32*u))
+@constraint(m, -2*M[2,8]==(c30*v + 2*c29*w + 3*K*c32*u))
 #x^2*y
-@constraint(m, 2*M[2,5]+M[3,6]== (2*c22*v + 3*c21*w + K*c26*u))
+@constraint(m, -(2*M[2,5]+M[3,6])== (2*c22*v + 3*c21*w + K*c26*u))
 #t^2*y
-@constraint(m, 2*M[3,8]==(2*c31*v + c30*w + 3*K*c33*u))
+@constraint(m, -2*M[3,8]==(2*c31*v + c30*w + 3*K*c33*u))
 #t^3
-@constraint(m, 2*M[4,8]== (c33*v + c32*w + 4*K*c34*u))
+@constraint(m, -2*M[4,8]== (c33*v + c32*w + 4*K*c34*u))
 #t*x^2
-@constraint(m, 2*M[4,6]== (c26*v + 3*c25*w + 2*K*c29*u))
+@constraint(m, -2*M[4,6]== (c26*v + 3*c25*w + 2*K*c29*u))
 #t*y^2
-@constraint(m, 2*M[4,7]==(3*c28*v + c27*w + 2*K*c31*u))
+@constraint(m, -2*M[4,7]==(3*c28*v + c27*w + 2*K*c31*u))
 #t*x*y
-@constraint(m, 2*M[4,5]== (2*c27*v + 2*c26*w + 2*K*c30*u))
+@constraint(m, -2*M[4,5]== (2*c27*v + 2*c26*w + 2*K*c30*u))
 #x4
 @constraint(m, M[6,6]==0)
 #y^4
@@ -208,12 +208,12 @@ end
 #fourth constraint V(S_final)<h
 x_o=Data1.destination[1]
 y_o=Data1.destination[2]
-@constraint(m, M_s[1,1]==c20*x_o^4 + c21*x_o^3*y_o + c10*x_o^3 + c22*x_o^2*y_o^2 + c11*x_o^2*y_o + c4*x_o^2 + c23*x_o*y_o^3 + c12*x_o*y_o^2 + c5*x_o*y_o + c1*x_o + c24*y_o^4
+@constraint(m, -M_s[1,1]==c20*x_o^4 + c21*x_o^3*y_o + c10*x_o^3 + c22*x_o^2*y_o^2 + c11*x_o^2*y_o + c4*x_o^2 + c23*x_o*y_o^3 + c12*x_o*y_o^2 + c5*x_o*y_o + c1*x_o + c24*y_o^4
 + c13*y_o^3 + c6*y_o^2 + c2*y_o + c0-h-small_epsilon)
-@constraint(m, 2*M_s[1,2]==c25*x_o^3 + c26*x_o^2*y_o + c14*x_o^2 + c27*x_o*y_o^2 + c15*x_o*y_o + c7*x_o + c28*y_o^3 + c16*y_o^2 + c8*y_o + c3)
-@constraint(m, M_s[2,2]+2*M_s[1,3]==c29*x_o^2 + c30*x_o*y_o + c17*x_o + c31*y_o^2 + c18*y_o + c9)
-@constraint(m, 2*M_s[2,3]==c19 + c32*x_o + c33*y_o)
-@constraint(m, M_s[3,3]==c34)
+@constraint(m, -2*M_s[1,2]==c25*x_o^3 + c26*x_o^2*y_o + c14*x_o^2 + c27*x_o*y_o^2 + c15*x_o*y_o + c7*x_o + c28*y_o^3 + c16*y_o^2 + c8*y_o + c3)
+@constraint(m, -(M_s[2,2]+2*M_s[1,3])==c29*x_o^2 + c30*x_o*y_o + c17*x_o + c31*y_o^2 + c18*y_o + c9)
+@constraint(m, -2*M_s[2,3]==c19 + c32*x_o + c33*y_o)
+@constraint(m, -M_s[3,3]==c34)
 
 
 

@@ -10,6 +10,7 @@
 
 
 function plot_V(C,u,file)
+close all
 %start: (50,100,0) [x,y,theta]
 %destination: (50,190) [x,y]
 %obstacle:(40,90)(60,90)
@@ -158,7 +159,7 @@ level=[(Borne_bas:dcurve1:0-puissance) 0 (dcurve1:dcurve1:Borne_haut)]
 [C, hh] = contour3(x,y,V_valeur.',number_curve);
 hh.LineColor='k';
 hh.LevelList=puissance*level;
-clabel(C,hh)
+%clabel(C,hh)
 % % size zpos to match the data
 % for i = 1 : length(hh)
 %     zz = get(hh(i), 'ZData');
