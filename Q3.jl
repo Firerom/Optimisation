@@ -8,7 +8,7 @@ function abs_(v::Variable)
 end
 fichier="obs_behind_side"
 Data1=loadDataFromFile(fichier)
-small_epsilon=0.00000001
+small_epsilon=1e-10
 #start: (50,100,0) [x,y,theta]
 #destination: (50,190) [x,y]
 #obstacle: x_obstacle1=Data1.obstacles[1][1]
@@ -18,7 +18,7 @@ small_epsilon=0.00000001
 #le nombre d'obstacle
 Nbr_obstacle=size(Data1.obstacles,1)
 
-u=0 #test for pi after
+u= pi#test for pi after
 v=6
 K=0.2
 b=0
@@ -38,45 +38,44 @@ m = Model(solver=MosekSolver())
 #matrices SDP for obstacle constraint
 @variable(m, M_obs[1:Nbr_obstacle,1:2,1:2])
 #matrix for the Vdot constraint
-@variable(m,M[1:12,1:12])
+@variable(m,M[1:12,1:12],Symmetric)
 #@SDconstraint(m,M<=0)
 # each matrix obstacle must be symmetric and SDP
 for n=1:Nbr_obstacle
-	#=for i=1:2
+	for i=1:2
 		for j=i:2
 			@constraint(m,M_obs[n,i,j]-M_obs[n,j,i]==0)
 		end
-	end=#
+	end
 #@SDconstraint(m,M_obs[n,:,:]>=0)
-@constraint(m,M_obs[n,1,1]>=abs_(M_obs[n,1,2]))
-@constraint(m,M_obs[n,2,2]>=abs_(M_obs[n,2,1]))
+@constraint(m,(M_obs[n,1,1])>=abs_(M_obs[n,1,2]))
+@constraint(m,(M_obs[n,2,2])>=abs_(M_obs[n,2,1]))
 end
 
 #Diagonnally dominant matrix
-#POURQUOI <= sum(abs) et non <= -sum(abs) ??
-@constraint(m,abs_(M[1,1])>=abs_(M[1,2])+abs_(M[1,3])+abs_(M[1,4])+abs_(M[1,5])+abs_(M[1,6])+abs_(M[1,7])+abs_(M[1,8])+abs_(M[1,9])+abs_(M[1,10])
+@constraint(m,(M[1,1])>=abs_(M[1,2])+abs_(M[1,3])+abs_(M[1,4])+abs_(M[1,5])+abs_(M[1,6])+abs_(M[1,7])+abs_(M[1,8])+abs_(M[1,9])+abs_(M[1,10])
 +abs_(M[1,11])+abs_(M[1,12]))
-@constraint(m,abs_(M[2,2])>=abs_(M[2,1])+abs_(M[2,3])+abs_(M[2,4])+abs_(M[2,5])+abs_(M[2,6])+abs_(M[2,7])+abs_(M[2,8])+abs_(M[2,9])+abs_(M[2,10])
+@constraint(m,(M[2,2])>=abs_(M[2,1])+abs_(M[2,3])+abs_(M[2,4])+abs_(M[2,5])+abs_(M[2,6])+abs_(M[2,7])+abs_(M[2,8])+abs_(M[2,9])+abs_(M[2,10])
 +abs_(M[2,11])+abs_(M[2,12]))
-@constraint(m,abs_(M[3,3])>=abs_(M[3,1])+abs_(M[3,2])+abs_(M[3,4])+abs_(M[3,5])+abs_(M[3,6])+abs_(M[3,7])+abs_(M[3,8])+abs_(M[3,9])+abs_(M[3,10])
+@constraint(m,(M[3,3])>=abs_(M[3,1])+abs_(M[3,2])+abs_(M[3,4])+abs_(M[3,5])+abs_(M[3,6])+abs_(M[3,7])+abs_(M[3,8])+abs_(M[3,9])+abs_(M[3,10])
 +abs_(M[3,11])+abs_(M[3,12]))
-@constraint(m,abs_(M[4,4])>=abs_(M[4,1])+abs_(M[4,2])+abs_(M[4,3])+abs_(M[4,5])+abs_(M[4,6])+abs_(M[4,7])+abs_(M[4,8])+abs_(M[4,9])+abs_(M[4,10])
+@constraint(m,(M[4,4])>=abs_(M[4,1])+abs_(M[4,2])+abs_(M[4,3])+abs_(M[4,5])+abs_(M[4,6])+abs_(M[4,7])+abs_(M[4,8])+abs_(M[4,9])+abs_(M[4,10])
 +abs_(M[4,11])+abs_(M[4,12]))
-@constraint(m,abs_(M[5,5])>=abs_(M[5,1])+abs_(M[5,2])+abs_(M[5,3])+abs_(M[5,4])+abs_(M[5,6])+abs_(M[5,7])+abs_(M[5,8])+abs_(M[5,9])+abs_(M[5,10])
+@constraint(m,(M[5,5])>=abs_(M[5,1])+abs_(M[5,2])+abs_(M[5,3])+abs_(M[5,4])+abs_(M[5,6])+abs_(M[5,7])+abs_(M[5,8])+abs_(M[5,9])+abs_(M[5,10])
 +abs_(M[5,11])+abs_(M[5,12]))
-@constraint(m,abs_(M[6,6])>=abs_(M[6,1])+abs_(M[6,2])+abs_(M[6,3])+abs_(M[6,4])+abs_(M[6,5])+abs_(M[6,7])+abs_(M[6,8])+abs_(M[6,9])+abs_(M[6,10])
+@constraint(m,(M[6,6])>=abs_(M[6,1])+abs_(M[6,2])+abs_(M[6,3])+abs_(M[6,4])+abs_(M[6,5])+abs_(M[6,7])+abs_(M[6,8])+abs_(M[6,9])+abs_(M[6,10])
 +abs_(M[6,11])+abs_(M[6,12]))
-@constraint(m,abs_(M[7,7])>=abs_(M[7,1])+abs_(M[7,2])+abs_(M[7,3])+abs_(M[7,4])+abs_(M[7,5])+abs_(M[7,6])+abs_(M[7,8])+abs_(M[7,9])+abs_(M[7,10])
+@constraint(m,(M[7,7])>=abs_(M[7,1])+abs_(M[7,2])+abs_(M[7,3])+abs_(M[7,4])+abs_(M[7,5])+abs_(M[7,6])+abs_(M[7,8])+abs_(M[7,9])+abs_(M[7,10])
 +abs_(M[7,11])+abs_(M[7,12]))
-@constraint(m,abs_(M[8,8])>=abs_(M[8,1])+abs_(M[8,2])+abs_(M[8,3])+abs_(M[8,4])+abs_(M[8,5])+abs_(M[8,6])+abs_(M[8,7])+abs_(M[8,9])+abs_(M[8,10])
+@constraint(m,(M[8,8])>=abs_(M[8,1])+abs_(M[8,2])+abs_(M[8,3])+abs_(M[8,4])+abs_(M[8,5])+abs_(M[8,6])+abs_(M[8,7])+abs_(M[8,9])+abs_(M[8,10])
 +abs_(M[8,11])+abs_(M[8,12]))
-@constraint(m,abs_(M[9,9])>=abs_(M[9,1])+abs_(M[9,2])+abs_(M[9,3])+abs_(M[9,4])+abs_(M[9,5])+abs_(M[9,6])+abs_(M[9,7])+abs_(M[9,8])+abs_(M[9,10])
+@constraint(m,(M[9,9])>=abs_(M[9,1])+abs_(M[9,2])+abs_(M[9,3])+abs_(M[9,4])+abs_(M[9,5])+abs_(M[9,6])+abs_(M[9,7])+abs_(M[9,8])+abs_(M[9,10])
 +abs_(M[9,11])+abs_(M[9,12]))
-@constraint(m,abs_(M[10,10])>=abs_(M[10,1])+abs_(M[10,2])+abs_(M[10,3])+abs_(M[10,4])+abs_(M[10,5])+abs_(M[10,6])+abs_(M[10,7])+abs_(M[10,8])+abs_(M[10,9])
+@constraint(m,(M[10,10])>=abs_(M[10,1])+abs_(M[10,2])+abs_(M[10,3])+abs_(M[10,4])+abs_(M[10,5])+abs_(M[10,6])+abs_(M[10,7])+abs_(M[10,8])+abs_(M[10,9])
 +abs_(M[10,11])+abs_(M[10,12]))
-@constraint(m,abs_(M[11,11])>=abs_(M[11,1])+abs_(M[11,2])+abs_(M[11,3])+abs_(M[11,4])+abs_(M[11,5])+abs_(M[11,6])+abs_(M[11,7])+abs_(M[11,8])+abs_(M[11,9])
+@constraint(m,(M[11,11])>=abs_(M[11,1])+abs_(M[11,2])+abs_(M[11,3])+abs_(M[11,4])+abs_(M[11,5])+abs_(M[11,6])+abs_(M[11,7])+abs_(M[11,8])+abs_(M[11,9])
 +abs_(M[11,10])+abs_(M[11,12]))
-@constraint(m,abs_(M[12,12])>=abs_(M[12,1])+abs_(M[12,2])+abs_(M[12,3])+abs_(M[12,4])+abs_(M[12,5])+abs_(M[12,6])+abs_(M[12,7])+abs_(M[12,8])+abs_(M[12,9])
+@constraint(m,(M[12,12])>=abs_(M[12,1])+abs_(M[12,2])+abs_(M[12,3])+abs_(M[12,4])+abs_(M[12,5])+abs_(M[12,6])+abs_(M[12,7])+abs_(M[12,8])+abs_(M[12,9])
 +abs_(M[12,10])+abs_(M[12,11]))
 
 
@@ -201,9 +200,6 @@ end
 @constraint(m,M[12,12]==0)
 
 
-#@constraint(m,test==abs_(c3))
-
-
 solve(m)
 println("\n")
 println("Les coefficients:")
@@ -226,14 +222,16 @@ for n=1:Nbr_obstacle
 		end
 	end
 end
-#println(getvalue(test))
-#@printf("Essai %e",getvalue(b))
+
 if u==pi
 	ustring="pi"
 else
 	ustring="0"
 end
-file_name=string("Q3_",ustring,"_",fichier,".txt")
+file_name=string("Result_Q3/Q3_",ustring,"_",fichier,".txt")
 ci=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
 writedlm(file_name, ci)
+
+
+println(getvalue(c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2+small_epsilon))
 ;
