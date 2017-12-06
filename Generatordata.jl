@@ -1,0 +1,12 @@
+include("optimisation1.jl")
+#saveDataToFile()
+
+obstacles = Array{Tuple{Float64,Float64}}(4)
+obstacles[1] = (40, 90)
+obstacles[2] = (60, 90)
+obstacles[3] = (47, 110)
+obstacles[4] = (50, 110)
+obstacles[5] = (50.1, 110)
+obstacles[6] = (49.1, 110)
+Data1 = Optinum.Data((50.0, 100.0, 0.0), (50.0, 190.0), obstacles)
+saveDataToFile(Data1,"Romain")

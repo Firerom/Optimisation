@@ -19,6 +19,9 @@ if isnumeric(file)
         file='obs_behind';
     elseif file==2
         file='obs_behind_side';
+    elseif file ==3
+        file='Romain';
+        
     else
         fprintf('File does not exist\n');
         fprintf('file = 1 = ''obs_behind'' \n');
@@ -43,6 +46,12 @@ if strcmpi(file,'obs_behind')
     Obstacle=[40 90;60 90];
 elseif strcmpi(file,'obs_behind_side')
     Obstacle=[40 90;60 90;60 110];
+elseif strcmpi(file,'Romain')
+%     obstacles[1] = (40, 90)
+% obstacles[2] = (60, 90)
+% obstacles[3] = (47, 110)
+% obstacles[4] = (50, 110)
+    Obstacle=[40 90;60 90;47,110;50 110];
 end
 V_obst=zeros(1,size(Obstacle,1));
 for l=1:length(theta_value)

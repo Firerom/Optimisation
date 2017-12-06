@@ -1,6 +1,14 @@
 include("optimisation1.jl")
-fichier="obs_behind"
+fichier="Romain"
 Data1=loadDataFromFile(fichier)
+
+#obstacles = Array{Tuple{Float64,Float64}}(4)
+#obstacles[1] = (40, 90)
+#obstacles[2] = (60, 90)
+#obstacles[3] = (47, 110)
+#obstacles[4] = (50, 110)
+#Data1 = Optinum.Data((50.0, 100.0, 0.0), (50.0, 190.0), obstacles)
+
 small_epsilon=0.000001
 #start: (50,100,0) [x,y,theta]
 #destination: (50,190) [x,y]
@@ -16,12 +24,12 @@ v=6
 K=0.2
 b=0
 w=0
-Time_of_fligth=20
-Time_step=0.1
-Number_t_step=100
+#Time_of_fligth=20
+Time_step=0.005
+Number_t_step=1200
 Time_of_fligth=Time_step*Number_t_step
 #L=obstacle_near(fichier,[70 90])
-k=100
+k=10
 u=-pi:(2*pi/(k-1)):pi
 Current_time=0
 u_possible=zeros(k)
@@ -57,10 +65,10 @@ for t=1:1:Number_t_step
 	println(u_possible)
 	s_possible=s_suivant[u_possible[2:length(u_possible)],:]
 	alpha=atan((-s_actual[2]+s_final[2])/(s_final[1]-s_actual[1]))
-	if (-s_actual[1]+s_final[1])/norm(s_final[1:2]-s_actual[1:2])>=0 #cos>0
+	if (-s_actual[1]+s_final[1])>=0 #cos>0
 		alpha=alpha
 	else
-		if (-s_actual[2]+s_final[2])/norm(s_final[1:2]-s_actual[1:2])>=0 #sin>0
+		if (-s_actual[2]+s_final[2])>=0 #sin>0
 			alpha=pi+alpha
 		else
 			alpha=alpha-pi
@@ -81,7 +89,15 @@ for t=1:1:Number_t_step
 	s_dot=[-v*sin(s_actual[3])+w v*cos(s_actual[3]) -K*(s_actual[3]-u_suivant)]
 	println(s_actual)
 	println(s_connu)
+
 	s_connu=s_actual+Time_step*s_dot
+	#s_connu=s_suivant[u_possible[Indice_u+1],:]
 	s_enreg[t,:]=s_connu
+	println(norm(s_enreg[t,1:2].'-s_final))
+	if(norm(s_enreg[t,1:2].'-s_final)<1)#moins d'un mettre 'lun de lautre ->ok
+		t=Number_t_step
+		break
+	end
 	u_possible=[0]
+
 end
