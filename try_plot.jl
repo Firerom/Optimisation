@@ -10,6 +10,12 @@
 #x = linspace(0,2*pi,1000); y = sin.(3*x + 4*cos.(2*x))
 #plot(x, y, color="red", linewidth=2.0, linestyle="--")
 
-using Plotly
-x = 1:10; y = rand(10) # These are the plotting data
-plot(x,y)
+function essaie(a,b)
+    c=a+b
+    d=a-b
+    m=[2*a 2*b]
+    return c,d,m
+end
+
+
+essaie(1,2)
