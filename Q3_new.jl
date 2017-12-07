@@ -1,11 +1,5 @@
 include("optimisation1.jl")
-using GLPKMathProgInterface
-function abs_(v::Variable)
-  @defVar(v.m, aux1 >= 0)
-  @addConstraint(v.m, aux1 >= v)
-  @addConstraint(v.m, aux1 >= -v)
-  return aux
-end
+
 fichier="obs_behind_side"
 Data1=loadDataFromFile(fichier)
 small_epsilon=1e-9
