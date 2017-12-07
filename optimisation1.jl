@@ -187,7 +187,7 @@ function clear_console()
 	close(io);
 end
 
-<<<<<<< HEAD
+
 
 function SDP_barrier_test(obstacle,s_actual,u)
 
@@ -263,7 +263,8 @@ function SDP_barrier_test(obstacle,s_actual,u)
 
     C=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
     return C
-=======
+end
+
 function mon_arctg(Initial,Final)#compris entre pi et -pi cercle trigo
 	alpha=atan((-Initial[2]+Final[2])/(Final[1]-Initial[1]))
 	if (-Initial[1]+Final[1])>=0 #cos>0
@@ -276,5 +277,4 @@ function mon_arctg(Initial,Final)#compris entre pi et -pi cercle trigo
 		end
 	end
 	return alpha
->>>>>>> 461ed43b795c31293da7f8bdb05864efe975a4a1
 end
