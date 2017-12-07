@@ -70,10 +70,10 @@ function obstacle_near(fichier,s_actual)
     for i=1:1:Nbr_obstacle
         x=Data1.obstacles[i][1]
     	y=Data1.obstacles[i][2]
-        println(x)
-        println(y)
+        #println(x)
+        #println(y)
         value=(x-s_actual[1])^2+(y-s_actual[2])^2<=Rayon^2
-        println(value)
+        #println(value)
         if((x-s_actual[1])^2+(y-s_actual[2])^2<=Rayon^2)
             obstacles_new=[obstacles_new; x y]
         end
@@ -150,7 +150,7 @@ function SDP_barrier(obstacle,s_actual,u)
 	grad_V=[(c1+c4*s_actual[2]+c5*s_actual[3]+2*c7*s_actual[1]),(c2+c4*s_actual[1]+c6*s_actual[3]+2*c8*s_actual[2]),(c3+c5*s_actual[1]+c6*s_actual[2]+2*c9*s_actual[3])]
 	#X_vec=[1,s_itera[k+1,1],s_itera[k+1,2],s_itera[k+1,3],s_itera[k+1,3]^2,s_itera[k+1,3]^3,s_itera[k+1,3]^4,s_itera[k+1,3]^5,s_itera[k+1,3]^6,s_itera[k+1,3]^7,s_itera[k+1,3]^8,s_itera[k+1,3]^9]
 	@constraint(m,dot(grad_V,s_dot)<=0)
-
+	
     solve(m)
 
     C=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
@@ -163,4 +163,16 @@ function find_index(matrix,element)
 			return i
 		end
 	end
+end
+
+function write_console(afficher)
+	io = open("Console.txt", "a+");
+	println(io, afficher);
+	close(io);
+end
+
+function clear_console()
+	io = open("Console.txt", "w");
+	println(io, "Begin\n");
+	close(io);
 end
