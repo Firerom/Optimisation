@@ -1,14 +1,17 @@
 include("optimisation1.jl")
-using GLPKMathProgInterface
-function abs_(v::Variable)
-  @defVar(v.m, aux1 >= 0)
-  @addConstraint(v.m, aux1 >= v)
-  @addConstraint(v.m, aux1 >= -v)
-  return aux
-end
+
 fichier="obs_behind_side"
 Data1=loadDataFromFile(fichier)
 small_epsilon=1e-9
+# =1e-5 for obs_behind u=0 and pi if lower it does not work
+# =1e-30 for obs_behind_side u=0 very sensitive to small_epsilon
+# =1e-9 for obs_behind_side u=pi very sensitive to small_epsilon
+gain=15000;
+# =1 for obs_behind u=0 and obs_behind_side u=0
+# =100 for obs_behind u=pi
+# =15000 for obs_behind_side u=pi
+#
+
 #start: (50,100,0) [x,y,theta]
 #destination: (50,190) [x,y]
 #obstacle: x_obstacle1=Data1.obstacles[1][1]
@@ -17,7 +20,7 @@ small_epsilon=1e-9
 
 #le nombre d'obstacle
 Nbr_obstacle=size(Data1.obstacles,1)
-gain=1;
+
 u= pi#test for pi after
 v=6
 K=0.2
@@ -72,7 +75,7 @@ for l=1:12
 	    else
 	        valeur=i;
 	    end
-		@constraint(m,gain*aux[l,i]>=0)
+		#@constraint(m,gain*aux[l,i]>=0)
 	    @constraint(m,gain*aux[l,i]>=-gain*M[l,valeur])
 	    @constraint(m,gain*aux[l,i]>=gain*M[l,valeur])
 	end
