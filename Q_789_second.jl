@@ -1,5 +1,5 @@
 include("optimisation1.jl")
-fichier="Romain"
+fichier="obs_behind"
 Data1=loadDataFromFile(fichier)
 
 #obstacles = Array{Tuple{Float64,Float64}}(4)
@@ -18,7 +18,7 @@ small_epsilon=0.000001
 
 #le nombre d'obstacle
 Nbr_obstacle=size(Data1.obstacles,1)
-
+clear_console()
 u=0 #test for pi after
 v=6
 K=0.2
@@ -42,6 +42,7 @@ for t=1:1:Number_t_step
 	Current_time+=Time_step
 	s_actual=s_connu
 	mes_obstacles_near=obstacle_near(fichier,s_actual)
+
 	mes_obstacles=mes_obstacles_near[1]
 	number_obst_near=mes_obstacles_near[2]
 
@@ -66,6 +67,8 @@ for t=1:1:Number_t_step
 			c8=C[9]
 			c9=C[10]
 			grad_V=[(c1+c4*s_actual[2]+c5*s_actual[3]+2*c7*s_actual[1]),(c2+c4*s_actual[1]+c6*s_actual[3]+2*c8*s_actual[2]),(c3+c5*s_actual[1]+c6*s_actual[2]+2*c9*s_actual[3])]
+			write_console(C,"")
+			write_console("V_dot:\n",dot(grad_V,s_dot))
 			if(dot(grad_V,s_dot)<=0)
 				u_possible=[u_possible i_u]
 			end
@@ -87,7 +90,42 @@ for t=1:1:Number_t_step
 		end
 
 	end
+
 	#calule de meilleur u->joris
+	write_console("u possible: ",u_possible)
+	s_possible=s_suivant[u_possible[2:length(u_possible)],:]
+ 	write_console("s_suivant possible: ","")
+	for i=1:size(s_possible,1)
+		write_console(s_possible[i,:],"")
+	end
+	write_console("\nS suivant(dynamique deja fixee): ",[s_possible[1,1] s_possible[1,2]])
+	write_console("S Final: ",s_final,"\narctg a realiser\n")
+
+	alpha=mon_arctg(s_suivant[1,1:2],s_final)
+	alpha=alpha-pi/2
+	write_console("alpha= ",alpha)
+	Aminimiser=s_possible[:,3]-alpha
+	write_console("A minimiser vers 0: ",Aminimiser)
+	optimum=extrema(abs.(Aminimiser))
+	min=optimum[1]
+	Indice_u=find_index(abs.(Aminimiser),min)
+	write_console("Choosen index: ",Indice_u)
+	s_choosen=s_possible[Indice_u,:]
+	write_console("Choosen s: ",s_choosen)
+	u_choosen=u[u_possible[Indice_u+1]]
+	write_console("Choosen u: ",u_choosen)
+	write_console("\n----------------------\n","")
+	s_connu=s_choosen.'
+	s_enreg[t,:]=s_connu
+	#=write_console("s_enreg: ","")
+	for i=1:size(s_enreg,1)
+		write_console(s_enreg[i,:],"")
+	end=#
+	#write_console(norm(s_enreg[t,1:2].'-s_final))
+	if(norm(s_enreg[t,1:2].'-s_final)<1)#moins d'un mettre 'lun de lautre ->ok
+		t=Number_t_step
+		break
+	end
 	u_possible=[0]
 
 end

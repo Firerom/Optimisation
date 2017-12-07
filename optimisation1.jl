@@ -67,6 +67,7 @@ function obstacle_near(fichier,s_actual)
     Data1=loadDataFromFile(fichier)
     Rayon=20    #m
     obstacles_new=[0 0]
+	counter=0
     for i=1:1:Nbr_obstacle
         x=Data1.obstacles[i][1]
     	y=Data1.obstacles[i][2]
@@ -76,9 +77,10 @@ function obstacle_near(fichier,s_actual)
         #println(value)
         if((x-s_actual[1])^2+(y-s_actual[2])^2<=Rayon^2)
             obstacles_new=[obstacles_new; x y]
+			counter+=1
         end
     end
-    return obstacles_new[2:size(obstacles_new,1),:]
+    return obstacles_new[2:size(obstacles_new,1),:] , counter
 end
 
 function SDP_barrier(obstacle,s_actual,u)
