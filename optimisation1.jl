@@ -66,7 +66,6 @@ end
 function obstacle_near(fichier,s_actual)
     Data1=loadDataFromFile(fichier)
     Rayon=20    #m
-	compteur=0
     obstacles_new=[0 0]
     for i=1:1:Nbr_obstacle
         x=Data1.obstacles[i][1]
@@ -77,10 +76,9 @@ function obstacle_near(fichier,s_actual)
         #println(value)
         if((x-s_actual[1])^2+(y-s_actual[2])^2<=Rayon^2)
             obstacles_new=[obstacles_new; x y]
-			compteur=compteur+1
         end
     end
-    return obstacles_new[2:size(obstacles_new,1),:], compteur
+    return obstacles_new[2:size(obstacles_new,1),:]
 end
 
 function SDP_barrier(obstacle,s_actual,u)
@@ -169,9 +167,10 @@ end
 
 function write_console(args...)
 	io = open("Console.txt", "a+");
-	nbr=length(args)
+	nbr=size(args,1)
+	println(nbr)
 	if nbr==1
-		println(io, args[1]);
+		println(io, args);
 	elseif nbr==2
 		println(io, args[1], args[2]);
 	elseif nbr==3
@@ -186,4 +185,18 @@ function clear_console()
 	io = open("Console.txt", "w");
 	println(io, "Begin\n");
 	close(io);
+end
+
+function mon_arctg(Initial,Final)#compris entre pi et -pi cercle trigo
+	alpha=atan((-Initial[2]+Final[2])/(Final[1]-Initial[1]))
+	if (-Initial[1]+Final[1])>=0 #cos>0
+		alpha=alpha
+	else
+		if (-Initial[2]+Final[2])>=0 #sin>0
+			alpha=pi+alpha
+		else
+			alpha=alpha-pi
+		end
+	end
+	return alpha
 end
