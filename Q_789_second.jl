@@ -53,10 +53,22 @@ for t=1:1:Number_t_step
 
 			s_suivant[i_u,:]=s_actual+Time_step*s_dot
 			C=SDP_barrier_test(mes_obstacles,s_actual,u[i_u])
-
-			#if(V_dot<=0)
-			#	u=u_possible
-			#end
+			x=s_suivant[i_u,1]
+			y=s_suivant[i_u,2]
+			theta=s_suivant[i_u,3]
+			c1=C[2]
+			c2=C[3]
+			c3=C[4]
+			c4=C[5]
+			c5=C[6]
+			c6=C[7]
+			c7=C[8]
+			c8=C[9]
+			c9=C[10]
+			grad_V=[(c1+c4*s_actual[2]+c5*s_actual[3]+2*c7*s_actual[1]),(c2+c4*s_actual[1]+c6*s_actual[3]+2*c8*s_actual[2]),(c3+c5*s_actual[1]+c6*s_actual[2]+2*c9*s_actual[3])]
+			if(dot(grad_V,s_dot)<=0)
+				u_possible=[u_possible i_u]
+			end
 		end
 
 	else
