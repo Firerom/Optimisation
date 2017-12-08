@@ -1,35 +1,32 @@
 include("optimisation1.jl")
-fichier="romain"
-Data1=loadDataFromFile(fichier)
-#Data1=generateData(4)
-#obstacles = Array{Tuple{Float64,Float64}}(4)
-#obstacles[1] = (40, 90)
-#obstacles[2] = (60, 90)
-#obstacles[3] = (47, 110)
-#obstacles[4] = (50, 110)
-#Data1 = Optinum.Data((50.0, 100.0, 0.0), (50.0, 190.0), obstacles)
+
+fichier="Romain2"
+
+# if load from a file
+#Data1=loadDataFromFile(fichier)
+#saveDataToFileTXT(Data1,fichier)
+# if generateData of n obstacle
+Data1=generateData(25)
+saveDataToFileTXT(Data1,fichier)
+saveDataToFile(Data1,fichier)
 tolerance=0.05
 small_epsilon=0.000001
-#start: (50,100,0) [x,y,theta]
-#destination: (50,190) [x,y]
-#obstacle: x_obstacle1=Data1.obstacles[1][1]
-#obstacle: y_obstacle1=Data1.obstacles[1][2]
-#obstacles are behind: (40,90) et (60,90) [90<100]
+
 
 #le nombre d'obstacle
 Nbr_obstacle=size(Data1.obstacles,1)
 clear_console()
-u=0 #test for pi after
+
 v=6
 K=0.2
 b=0
-w=-0.25
+w=0
 Time_of_fligth=20
 Time_step=0.1
 Number_t_step=400
 Time_of_fligth=Time_step*Number_t_step
 #L=obstacle_near(fichier,[70 90])
-k=10
+k=20
 u=-pi:(2*pi/(k-1)):pi
 Current_time=0
 u_possible=zeros(k)
@@ -143,3 +140,4 @@ end
 write_console("S_trajet: ",s_enreg)
 write_console("Obsta: ",Data1.obstacles)
 write_console("Destin: ",s_final)
+savetrajectoryToFileTXT(s_enreg,fichier)
