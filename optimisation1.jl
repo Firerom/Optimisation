@@ -19,10 +19,48 @@ function loadDataFromFile(instanceName::String)
 	return load(fileName, "instance")
 end
 
+function saveDataToFileTXT(data::Optinum.Data, instanceName::String)
+	fileName = string("Matlabdonnee/Donne_", instanceName, ".txt")
+	#save(fileName, "instance", data)
+	s_final_1=data.destination[1]
+	s_final_2=data.destination[2]
+	s_connu_1=data.start[1]
+	s_connu_2=data.start[2]
+	s_connu_3=data.start[3]
+	Nbr_obstacle=size(data.obstacles,1)
+	open(fileName, "w") do f
+	         write(f, "$s_connu_1 $s_connu_2 $s_connu_3\n")
+			 write(f, "$s_final_1 $s_final_2 \n")
+			 write(f,"$Nbr_obstacle\n")
+			 for i=1:Nbr_obstacle
+				 s_obs_1_i=data.obstacles[i][1]
+				 s_obs_2_i=data.obstacles[i][2]
+				 write(f, "$s_obs_1_i $s_obs_2_i\n")
+
+			 end
+	end# n
+	println("Data saved to $fileName")
+end
+
 function saveDataToFile(data::Optinum.Data, instanceName::String)
 	fileName = string("data/", instanceName, ".jld")
 	save(fileName, "instance", data)
 	println("Data saved to $fileName")
+end
+
+function savetrajectoryToFileTXT(s_enreg,instanceName::String)
+	fileName = string("Matlabdonnee/trajectory_", instanceName, ".txt")
+	length=size(s_enreg,1)
+	#println("length=",length)
+	open(fileName, "w") do f
+		for i=1:length
+			s_1=s_enreg[i,1]
+			s_2=s_enreg[i,2]
+			s_3=s_enreg[i,3]
+			 write(f, "$s_1 $s_2 $s_3\n")
+		end
+	end
+	println("trajectory saved to $fileName")
 end
 
 ###################################################
@@ -141,8 +179,8 @@ function SDP_barrier(obstacle,s_actual,u)
 
     #Second constraint with the obstacles (M_obs already SDP), for each of them
     for i=1:Nbr_obstacle
-    	x_o=Data1.obstacles[i][1]
-    	y_o=Data1.obstacles[i][2]
+    	x_o=obstacles[i][1]
+    	y_o=obstacles[i][2]
     	@constraint(m, M_obs[i,1,1]==c0+c1*x_o+c2*y_o+c4*x_o*y_o+c7*x_o^2+c8*y_o^2-b-small_epsilon)
     	@constraint(m, 2*M_obs[i,1,2]==c3+c5*x_o+c6*y_o)
     	@constraint(m, M_obs[i,2,2]==c9)
@@ -249,8 +287,8 @@ function SDP_barrier_test(obstacle,s_actual,u)
 
     #Second constraint with the obstacles (M_obs already SDP), for each of them
     for i=1:Nbr_obstacle
-    	x_o=Data1.obstacles[i][1]
-    	y_o=Data1.obstacles[i][2]
+    	x_o=obstacles[i][1]
+    	y_o=obstacles[i][2]
     	@constraint(m, M_obs[i,1,1]==c0+c1*x_o+c2*y_o+c4*x_o*y_o+c7*x_o^2+c8*y_o^2-b-small_epsilon)
     	@constraint(m, 2*M_obs[i,1,2]==c3+c5*x_o+c6*y_o)
     	@constraint(m, M_obs[i,2,2]==c9)
