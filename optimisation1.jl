@@ -126,10 +126,10 @@ function obstacle_near(fichier,s_actual)
     return obstacles_new[2:size(obstacles_new,1),:] , counter
 end
 
-function SDP_barrier(obstacle,s_actual,u)
+function SDP_barrier(obstacle,s_actual,u,w,Time_step)
 
 
-    small_epsilon=0.000001
+    small_epsilon=0.1
 
     #le nombre d'obstacle
     Nbr_obstacle=size(obstacle,1)
@@ -137,6 +137,28 @@ function SDP_barrier(obstacle,s_actual,u)
     v=6
     K=0.2
     b=0
+
+	#compute a circle around the start(actual) position
+	s_dot=[-v*sin(s_actual[3])+w v*cos(s_actual[3]) -K*(s_actual[3]-u)]
+	s_suivant=s_actual+Time_step*s_dot
+
+	XY_R=Time_step*s_dot
+	R_max=norm([XY_R[1] XY_R[2]])
+	R_max=1.5
+	k=20
+	R=0:R_max/k:R_max
+	angle=0:(2*pi/(k)):(2*pi)
+	Point=zeros(k,k,2)
+	Point_s=zeros(k,k,2)
+	for j=1:1:k
+		for i=1:1:k
+			Point[j,i,1]=R[j]*cos(angle[i])+s_actual[1]
+			Point[j,i,2]=R[j]*sin(angle[i])+s_actual[2]
+			Point_s[j,i,1]=R[j]*cos(angle[i])+s_suivant[1]
+			Point_s[j,i,2]=R[j]*sin(angle[i])+s_suivant[2]
+		end
+	end
+
 
     m = Model(solver=MosekSolver())
 
@@ -180,7 +202,18 @@ function SDP_barrier(obstacle,s_actual,u)
 
     #First constraint initially in S_safe
     @constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2+small_epsilon<=b)
-
+	for j=1:1:k
+		for i=1:1:size(Point,1)
+			x_i=Point[j,i,1]
+			y_i=Point[j,i,2]
+			theta_i=s_actual[3]
+			@constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2+small_epsilon<=b)
+			x_i=Point_s[j,i,1]
+			y_i=Point_s[j,i,2]
+			theta_i=s_suivant[3]
+			@constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2+small_epsilon<=b)
+		end
+	end
     #Second constraint with the obstacles (M_obs already SDP), for each of them
     for i=1:Nbr_obstacle
 		x_o=obstacle[i,1]
@@ -195,6 +228,13 @@ function SDP_barrier(obstacle,s_actual,u)
 	grad_V=[(c1+c4*s_actual[2]+c5*s_actual[3]+2*c7*s_actual[1]),(c2+c4*s_actual[1]+c6*s_actual[3]+2*c8*s_actual[2]),(c3+c5*s_actual[1]+c6*s_actual[2]+2*c9*s_actual[3])]
 	#X_vec=[1,s_itera[k+1,1],s_itera[k+1,2],s_itera[k+1,3],s_itera[k+1,3]^2,s_itera[k+1,3]^3,s_itera[k+1,3]^4,s_itera[k+1,3]^5,s_itera[k+1,3]^6,s_itera[k+1,3]^7,s_itera[k+1,3]^8,s_itera[k+1,3]^9]
 	@constraint(m,dot(grad_V,s_dot)<=0)
+	for j=1:1:k
+		for i=1:1:k
+		s_dot1=[-v*sin(s_actual[3])+w,v*cos(s_actual[3]),-K*(s_actual[3]-u)]
+		grad_V1=[(c1+c4*Point[j,i,2]+c5*s_actual[3]+2*c7*Point[j,i,1]),(c2+c4*Point[j,i,1]+c6*s_actual[3]+2*c8*Point[j,i,2]),(c3+c5*Point[j,i,1]+c6*Point[j,i,2]+2*c9*s_actual[3])]
+		@constraint(m,dot(grad_V1,s_dot1)<=0)
+		end
+	end
 
     solve(m)
 
@@ -324,7 +364,7 @@ function mon_arctg(Initial,Final)#compris entre pi et -pi cercle trigo
 	return alpha
 end
 
-function SDP_barrier_jo(obstacle,s_actual,u)
+function SDP_barrier_jo(obstacle,s_actual,u,w,Time_step)
 	include("optimisation1.jl")
 	fichier="obs_behind_side"
 	Data1=loadDataFromFile(fichier)
@@ -341,6 +381,28 @@ function SDP_barrier_jo(obstacle,s_actual,u)
 	v=6
 	K=0.2
 	b=0
+
+	#compute a circle around the start(actual) position
+	s_dot=[-v*sin(s_actual[3])+w v*cos(s_actual[3]) -K*(s_actual[3]-u)]
+	s_suivant=s_actual+Time_step*s_dot
+
+	XY_R=Time_step*s_dot
+	R_max=norm([XY_R[1] XY_R[2]])
+	R_max=1.5
+	k=20
+	R=0:R_max/k:R_max
+	angle=0:(2*pi/(k)):(2*pi)
+	Point=zeros(k,k,2)
+	Point_s=zeros(k,k,2)
+	for j=1:1:k
+		for i=1:1:k
+			Point[j,i,1]=R[j]*cos(angle[i])+s_actual[1]
+			Point[j,i,2]=R[j]*sin(angle[i])+s_actual[2]
+			Point_s[j,i,1]=R[j]*cos(angle[i])+s_suivant[1]
+			Point_s[j,i,2]=R[j]*sin(angle[i])+s_suivant[2]
+		end
+	end
+
 
 	m = Model(solver=MosekSolver())
 

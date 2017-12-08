@@ -24,8 +24,8 @@ K=0.2
 b=0
 w=0
 Time_of_fligth=20
-Time_step=0.1
-Number_t_step=13
+Time_step=0.01
+Number_t_step=2300
 Time_of_fligth=Time_step*Number_t_step
 #L=obstacle_near(fichier,[70 90])
 k=10
@@ -44,7 +44,8 @@ for t=1:1:Number_t_step
 
 	mes_obstacles=mes_obstacles_near[1]
 	number_obst_near=mes_obstacles_near[2]
-
+	write_console("number_obst_near: ",number_obst_near)
+	write_console("mes_obstacles: ",mes_obstacles)
 	if(number_obst_near!=0)# il y a des obstacles
 	#phase avec le calcul de SDP pour V  car obstacle
 		for i_u=1:1:k
@@ -52,14 +53,11 @@ for t=1:1:Number_t_step
 			s_dot=[-v*sin(s_actual[3])+w v*cos(s_actual[3]) -K*(s_actual[3]-u[i_u])]
 
 			s_suivant[i_u,:]=s_actual+Time_step*s_dot
-			C=SDP_barrier_ro(mes_obstacles,s_actual,u[i_u],w)
+			C=SDP_barrier(mes_obstacles,s_actual,u[i_u],w,Time_step)
 			x=s_suivant[i_u,1]
 			y=s_suivant[i_u,2]
 			theta=s_suivant[i_u,3]
-
-
-			write_console(C," ")
-
+			write_console("Coeff: \n",C)
 			if(!isnan(C[1]))
 				u_possible=[u_possible i_u]
 			end
@@ -125,4 +123,3 @@ write_console("S_trajet: ",s_enreg)
 write_console("Obsta: ",Data1.obstacles)
 write_console("Destin: ",s_final)
 savetrajectoryToFileTXT(s_enreg,fichier)
- 
