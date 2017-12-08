@@ -62,10 +62,10 @@ for i=1:12
 		@constraint(m,M[i,j]-M[j,i]==0)
 		@constraint(m,Ab_dot[i,j,1]-2*M[i,j]==0)
 		@constraint(m,Ab_dot[i,j,2]-(M[i,i]-M[j,j])==0)
-		@constraint(m,norm(Ab_dot[i,j,:])  <=-(M[i,i]+M[j,j]) )
+		@constraint(m,norm(Ab_dot[i,j,:])  <=(M[i,i]+M[j,j]) )
 	end
 	#element diagonaux inférieur à zero
-	@constraint(m,M[i,i]<=0)
+	@constraint(m,M[i,i]>=0)
 end
 #V(s) polynome
 #c0, c1, c2,    c3, c4,     c5,     c6,  c7,  c8,      c9
@@ -81,7 +81,7 @@ theta_i=Data1.start[3];
 #@constraint(m, -(c7+c8+c9)>=0.001)
 
 #First constraint initially in S_safe
-@constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2<=b-small_epsilon)
+@constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2+small_epsilon<=b)
 
 #Second constraint with the obstacles (M_obs already SDP), for each of them
 for i=1:Nbr_obstacle
@@ -94,65 +94,65 @@ end
 
 #third constraint V_dot
 # 1
-@constraint(m,c2*v + K*c3*u==M[1,1])
+@constraint(m,c2*v + K*c3*u==-M[1,1])
 # x
-@constraint(m,c4*v + K*c5*u==2*M[1,2])
+@constraint(m,c4*v + K*c5*u==-2*M[1,2])
 # y
-@constraint(m,2*c8*v + K*c6*u==2*M[1,3])
+@constraint(m,2*c8*v + K*c6*u==-2*M[1,3])
 # xt
-@constraint(m,- K*c5 - 2*c7*v==2*M[2,4])
+@constraint(m,- K*c5 - 2*c7*v==-2*M[2,4])
 # xt2
-@constraint(m,-(c4*v)/2==2*M[2,5])
+@constraint(m,-(c4*v)/2==-2*M[2,5])
 # xt3
-@constraint(m,(2*c7*v)/6==2*M[2,6])
+@constraint(m,(2*c7*v)/6==-2*M[2,6])
 # xt4
-@constraint(m,(c4*v)/24==2*M[2,7])
+@constraint(m,(c4*v)/24==-2*M[2,7])
 # xt5
-@constraint(m,-(2*c7*v)/120==2*M[2,8])
+@constraint(m,-(2*c7*v)/120==-2*M[2,8])
 # xt6
-@constraint(m,-(c4*v)/720==2*M[2,9])
+@constraint(m,-(c4*v)/720==-2*M[2,9])
 # xt7
-@constraint(m,(2*c7*v)/5040==2*M[2,10])
+@constraint(m,(2*c7*v)/5040==-2*M[2,10])
 # xt9
-@constraint(m,-(2*c7*v)/362880==2*M[2,12])
+@constraint(m,-(2*c7*v)/362880==-2*M[2,12])
 # yt
-@constraint(m,- K*c6 - c4*v==2*M[3,4])
+@constraint(m,- K*c6 - c4*v==-2*M[3,4])
 # yt2
-@constraint(m,-(2*c8*v)/2==2*M[3,5])
+@constraint(m,-(2*c8*v)/2==-2*M[3,5])
 # yt3
-@constraint(m,(c4*v)/6==2*M[3,6])
+@constraint(m,(c4*v)/6==-2*M[3,6])
 # yt4
-@constraint(m,(2*c8*v)/24==2*M[3,7])
+@constraint(m,(2*c8*v)/24==-2*M[3,7])
 # yt5
-@constraint(m,-(c4*v)/120==2*M[3,8])
+@constraint(m,-(c4*v)/120==-2*M[3,8])
 # yt6
-@constraint(m,-(2*c8*v)/720==2*M[3,9])
+@constraint(m,-(2*c8*v)/720==-2*M[3,9])
 # yt7
-@constraint(m,(c4*v)/5040==2*M[3,10])
+@constraint(m,(c4*v)/5040==-2*M[3,10])
 # yt9
-@constraint(m,-(c4*v)/362880==2*M[3,12])
+@constraint(m,-(c4*v)/362880==-2*M[3,12])
 
 
 # t
-@constraint(m,c6*v - c1*v - K*c3 + 2*K*c9*u==2*M[1,4])
+@constraint(m,c6*v - c1*v - K*c3 + 2*K*c9*u==-2*M[1,4])
 # t1
-@constraint(m,- 2*K*c9 - c5*v - (c2*v)/2==2*M[1,5]+M[4,4])
+@constraint(m,- 2*K*c9 - c5*v - (c2*v)/2==-(2*M[1,5]+M[4,4]))
 # t2
-@constraint(m,(c1*v)/6 - (c6*v)/2==2*M[1,6]+M[4,5]+M[4,5])
+@constraint(m,(c1*v)/6 - (c6*v)/2==-(2*M[1,6]+M[4,5]+M[4,5]))
 # t3
-@constraint(m,(c2*v)/24 + (c5*v)/6==2*M[1,7]+M[4,6]+M[5,5]+M[4,6])
+@constraint(m,(c2*v)/24 + (c5*v)/6==-(2*M[1,7]+M[4,6]+M[5,5]+M[4,6]))
 # t4
-@constraint(m,(c6*v)/24 - (c1*v)/120==2*M[1,8]+M[4,7]+M[5,6]+M[5,6]+M[4,7])
+@constraint(m,(c6*v)/24 - (c1*v)/120==-(2*M[1,8]+M[4,7]+M[5,6]+M[5,6]+M[4,7]))
 # t5
-@constraint(m,- (c2*v)/720 - (c5*v)/120==2*M[1,9]+M[4,8]+M[5,7]+M[6,6]+M[5,7]+M[4,8])
+@constraint(m,- (c2*v)/720 - (c5*v)/120==-(2*M[1,9]+M[4,8]+M[5,7]+M[6,6]+M[5,7]+M[4,8]))
 # t6
-@constraint(m,(c1*v)/5040 - (c6*v)/720==2*M[1,10]+M[4,9]+M[5,8]+M[6,7]+M[6,7]+M[5,8]+M[4,9])
+@constraint(m,(c1*v)/5040 - (c6*v)/720==-(2*M[1,10]+M[4,9]+M[5,8]+M[6,7]+M[6,7]+M[5,8]+M[4,9]))
 # t7
-@constraint(m,(c5*v)/5040==2*M[1,11]+M[4,10]+M[5,9]+M[6,8]+M[7,7]+M[6,8]+M[5,9]+M[4,10])
+@constraint(m,(c5*v)/5040==-(2*M[1,11]+M[4,10]+M[5,9]+M[6,8]+M[7,7]+M[6,8]+M[5,9]+M[4,10]))
 # t8
-@constraint(m,-(c1*v)/362880==2*M[1,12]+M[4,11]+M[5,10]+M[6,9]+M[7,8]+M[7,8]+M[6,9]+M[5,10]+M[4,11])
+@constraint(m,-(c1*v)/362880==-(2*M[1,12]+M[4,11]+M[5,10]+M[6,9]+M[7,8]+M[7,8]+M[6,9]+M[5,10]+M[4,11]))
 # t9
-@constraint(m,-(c5*v)/362880==M[4,12]+M[5,11]+M[6,10]+M[7,9]+M[8,8]+M[7,9]+M[6,10]+M[5,11]+M[4,12])
+@constraint(m,-(c5*v)/362880==-(M[4,12]+M[5,11]+M[6,10]+M[7,9]+M[8,8]+M[7,9]+M[6,10]+M[5,11]+M[4,12]))
 
 
 
@@ -214,7 +214,7 @@ if u==pi
 else
 	ustring="0"
 end
-file_name=string("Q2_",ustring,"_",fichier,".txt")
+file_name=string("Result_Q2/Q2_",ustring,"_",fichier,".txt")
 ci=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
 writedlm(file_name, ci)
 ;
