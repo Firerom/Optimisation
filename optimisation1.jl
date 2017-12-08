@@ -68,7 +68,8 @@ function obstacle_near(fichier,s_actual)
     Rayon=20    #m
     obstacles_new=[0 0]
 	counter=0
-    for i=1:1:Nbr_obstacle
+	Nbr_obstacle=size(Data1.obstacles[:][1],1)
+    for i=1:Nbr_obstacle
         x=Data1.obstacles[i][1]
     	y=Data1.obstacles[i][2]
         #println(x)
