@@ -33,8 +33,8 @@ function saveDataToFileTXT(data::Optinum.Data, instanceName::String)
 			 write(f, "$s_final_1 $s_final_2 \n")
 			 write(f,"$Nbr_obstacle\n")
 			 for i=1:Nbr_obstacle
-				 s_obs_1_i=data.obstacles[i,1]
-				 s_obs_2_i=data.obstacles[i,2]
+				 s_obs_1_i=data.obstacles[i][1]
+				 s_obs_2_i=data.obstacles[i][2]
 				 write(f, "$s_obs_1_i $s_obs_2_i\n")
 
 			 end
@@ -213,7 +213,7 @@ end
 function write_console(args...)
 	io = open("Console.txt", "a+");
 	nbr=size(args,1)
-	println(nbr)
+	#println(nbr)
 	if nbr==1
 		println(io, args);
 	elseif nbr==2
