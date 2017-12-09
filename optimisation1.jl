@@ -48,15 +48,15 @@ function saveDataToFile(data::Optinum.Data, instanceName::String)
 	println("Data saved to $fileName")
 end
 
-function savetrajectoryToFileTXT(s_enreg,instanceName::String)
+function savetrajectoryToFileTXT(s_enreg1,instanceName::String)
 	fileName = string("Matlabdonnee/trajectory_", instanceName, ".txt")
-	length=size(s_enreg,1)
-	#println("length=",length)
+	length=size(s_enreg1,1)
+	println("length=",length)
 	open(fileName, "w") do f
 		for i=1:length
-			s_1=s_enreg[i,1]
-			s_2=s_enreg[i,2]
-			s_3=s_enreg[i,3]
+			s_1=s_enreg1[i,1]
+			s_2=s_enreg1[i,2]
+			s_3=s_enreg1[i,3]
 			 write(f, "$s_1 $s_2 $s_3\n")
 		end
 	end

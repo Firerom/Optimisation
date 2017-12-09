@@ -25,7 +25,7 @@ b=0
 w=0
 Time_of_fligth=20
 Time_step=0.1
-Number_t_step=2300
+Number_t_step=300
 Time_of_fligth=Time_step*Number_t_step
 #L=obstacle_near(fichier,[70 90])
 k=21
@@ -51,7 +51,7 @@ while t<=Number_t_step
 	write_console("mes_obstacles: ",mes_obstacles)
 	if(number_obst_near!=0)# il y a des obstacles
 	#phase avec le calcul de SDP pour V  car obstacle
-		nbr_iteration=18
+		nbr_iteration=10
 		s_garder=zeros(k,nbr_iteration,3)
 		for i_u=1:1:k
 			i_u=round(i_u)

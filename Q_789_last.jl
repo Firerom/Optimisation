@@ -3,13 +3,13 @@ include("optimisation1.jl")
 fichier="Romain"
 
 # if load from a file
-#Data1=loadDataFromFile(fichier)
-#saveDataToFileTXT(Data1,fichier)
+Data1=loadDataFromFile(fichier)
+saveDataToFileTXT(Data1,fichier)
 
 # if generateData of n obstacle
-Data1=generateData(50)
-saveDataToFileTXT(Data1,fichier)
-saveDataToFile(Data1,fichier)
+#Data1=generateData(150)
+#saveDataToFileTXT(Data1,fichier)
+#saveDataToFile(Data1,fichier)
 
 tolerance=0.00
 small_epsilon=0.000001
@@ -45,6 +45,7 @@ s_suivantfree=zeros(3)
 s_final=[Data1.destination[1] Data1.destination[2]]
 s_connu=[Data1.start[1] Data1.start[2] Data1.start[3]]
 s_enreg=zeros(Number_t_step,3)
+s_enreg_final=zeros(Number_t_step,3)
 t=1
 
 #distSDP=zeros(nbr_iteration_SDP,1)
@@ -145,17 +146,18 @@ while t<=Number_t_step
 		write_console("Indice_u: ",Indice_u)
 		write_console("s_garder: ",s_garderSDP[u_possible[Indice_u+1],:,:])
 		write_console("s_choosen: ",s_choosen.')
-
+		count=0
 		for i=1:nbr_iteration_SDP
 			s_enreg[t,:]=s_garderSDP[u_possible[Indice_u+1],i,:]
 			t+=1
+			count+=1
 			if t>Number_t_step
 				break
 			end
 		end
-		if t>Number_t_step
-			break
-		end
+		#if t>Number_t_step
+		#	break
+		#end
 
 		write_console("t: ",t)
 	else
@@ -163,16 +165,18 @@ while t<=Number_t_step
 		write_console("s_garder: ",s_garderfree[u_possible[Indice_u+1],:,:])
 		write_console("Indice s_garderfree:",u_possible[Indice_u+1])
 		write_console("s_choosen: ",s_choosen.')
+		count=0
 		for i=1:nbr_iteration_free
 			s_enreg[t,:]=s_garderfree[u_possible[Indice_u+1],i,:]
 			t+=1
+			count+=1
 			if t>Number_t_step
 				break
 			end
 		end
-		if t>Number_t_step
-			break
-		end
+		#if t>Number_t_step
+		#	break
+		#end
 
 		write_console("t: ",t)
 	end
@@ -182,10 +186,19 @@ while t<=Number_t_step
 	end=#
 	#write_console(norm(s_enreg[t,1:2].'-s_final))
 	write_console("\n----------------------\n","")
-	if(norm(s_enreg[t,1:2].'-s_final)<1)#moins d'un mettre 'lun de lautre ->ok
-		t=Number_t_step
+	for i=1:count
+		if(norm(s_enreg[t+i-count,1:2].'-s_final)<1)#moins d'un mettre 'lun de lautre ->ok
+			s_enreg_final=s_enreg[1:(t+i-count),1:3]
+			t=Number_t_step+1
+			break
+		end
+
+	end
+	if(t>Number_t_step)
+		#write_console("S_trajet: ",s_enreg)
 		break
 	end
+
 	u_possible=[0]
 
 end
@@ -193,4 +206,5 @@ end
 write_console("S_trajet: ",s_enreg)
 write_console("Obsta: ",Data1.obstacles)
 write_console("Destin: ",s_final)
-savetrajectoryToFileTXT(s_enreg,fichier)
+write_console("prout",size(s_enreg_final))
+savetrajectoryToFileTXT(s_enreg_final,fichier)
