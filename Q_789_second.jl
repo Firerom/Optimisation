@@ -143,21 +143,22 @@ while t<=Number_t_step
 	#s_enreg[t,:]=s_connu
 	if(number_obst_near!=0)
 		write_console("Indice_u: ",Indice_u)
-		write_console("s_garder: ",s_garderSDP[Indice_u,:,:])
+		write_console("s_garder: ",s_garderSDP[u_possible[Indice_u+1],:,:])
 		write_console("s_choosen: ",s_choosen.')
 
 		for i=1:nbr_iteration_SDP
-			s_enreg[t,:]=s_garderSDP[Indice_u+1,i,:]
+			s_enreg[t,:]=s_garderSDP[u_possible[Indice_u+1],i,:]
 			t+=1
 		end
 		t-=1
 		write_console("t: ",t)
 	else
 		write_console("Indice_u: ",Indice_u)
-		write_console("s_garder: ",s_garderfree[Indice_u,:,:])
-			write_console("s_choosen: ",s_choosen.')
+		write_console("s_garder: ",s_garderfree[u_possible[Indice_u+1],:,:])
+		write_console("Indice s_garderfree:",u_possible[Indice_u+1])
+		write_console("s_choosen: ",s_choosen.')
 		for i=1:nbr_iteration_free
-			s_enreg[t,:]=s_garderfree[Indice_u+1,i,:]
+			s_enreg[t,:]=s_garderfree[u_possible[Indice_u+1],i,:]
 			t+=1
 		end
 		t-=1
