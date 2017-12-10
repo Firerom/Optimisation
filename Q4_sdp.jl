@@ -174,7 +174,7 @@ end
 #x^3*y
 @constraint(m, 2*M[5,6]==0)
 #x*y^3
-@constraint(m, 2*M[5,6]==0)
+@constraint(m, 2*M[5,7]==0)
 
 #fourth constraint V(S_final)<h
 x_o=Data1.destination[1]

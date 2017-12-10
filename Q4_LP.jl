@@ -180,7 +180,7 @@ end
 #y
 @constraint(m, 2*M[1,3]==-(2*c6*v + c5*w + K*c8*u))
 #t
-@constraint(m, 2*M[1,4]==-(2*c6*v + c5*w + K*c8*u))
+@constraint(m, 2*M[1,4]==-(c8*v + c7*w + 2*K*c9*u))
 #x^2
 @constraint(m, 2*M[1,6]+M[2,2]==-(c11*v + 3*c10*w + K*c14*u))
 #y^2
@@ -230,7 +230,7 @@ end
 #x^3*y
 @constraint(m, 2*M[5,6]==0)
 #x*y^3
-@constraint(m, 2*M[5,6]==0)
+@constraint(m, 2*M[5,7]==0)
 
 #fourth constraint V(S_final)<h
 x_o=Data1.destination[1]
