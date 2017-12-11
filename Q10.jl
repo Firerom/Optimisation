@@ -28,7 +28,7 @@ Nbr_obstacle=size(Data1.obstacles,1)
 u= 0#test for pi after
 v=6
 K=0.2
-b=0
+b=0.001
 
 
 for i=1:Nbr_obstacle
@@ -225,29 +225,6 @@ println(getvalue(c6))
 println(getvalue(c7))
 println(getvalue(c8))
 println(getvalue(c9),"\n")
-
-#=for n=1:Nbr_obstacle
-	for i=1:2
-		for j=1:2
-			println(getvalue(M_obs[n,i,j]))
-		end
-	end
-end
-
-for l=1:12
-	for i=1:11
-		println(getvalue(aux[l,i]))
-	end
-end
-
-if u==pi
-	ustring="pi"
-else
-	ustring="0"
-end
-file_name=string("Result_Q3/Q3_",ustring,"_",fichier,".txt")
-ci=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
-writedlm(file_name, ci)=#
 
 
 println(getvalue(c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2+small_epsilon))
