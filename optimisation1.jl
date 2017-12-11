@@ -237,6 +237,125 @@ function SDP_barrier(obstacle,s_actual,s_suivant,u,w,Time_step)
     return C
 end
 
+
+function barrier(obstacle,s_actual,s_suivant,u,w,Time_step,model)
+
+
+    small_epsilon=0.001
+
+    #le nombre d'obstacle
+    Nbr_obstacle=size(obstacle,1)
+
+    v=6
+    K=0.2
+    b=0
+
+	#compute a circle around the start(actual) position
+
+	#XY_R=Time_step*s_dot
+	#R_max=norm([XY_R[1] XY_R[2]])
+	R=2
+	k=4
+	angle=0:(2*pi/(k)):(2*pi)
+	Point=zeros(k,k,2)
+	Point_s=zeros(k,k,2)
+	for i=1:1:k
+		Point[i,1]=R*cos(angle[i])+s_actual[1]
+		Point[i,2]=R*sin(angle[i])+s_actual[2]
+		Point_s[i,1]=R*cos(angle[i])+s_suivant[1]
+		Point_s[i,2]=R*sin(angle[i])+s_suivant[2]
+	end
+
+
+    m = Model(solver=MosekSolver())
+
+    @variable(m, c0)
+    @variable(m, c1)
+    @variable(m, c2)
+    @variable(m, c3)
+    @variable(m, c4)
+    @variable(m, c5)
+    @variable(m, c6)
+    @variable(m, c7)
+    @variable(m, c8)
+    @variable(m, c9)
+    #matrices SDP for obstacle constraint
+	if(model==1)
+	    @variable(m, M_obs[1:Nbr_obstacle,1:2,1:2])
+
+
+	    # each matrix obstacle must be symmetric and SDP
+	    for n=1:Nbr_obstacle
+	    	for i=1:2
+	    		for j=i:2
+	    			@constraint(m,M_obs[n,i,j]-M_obs[n,j,i]==0)
+	    		end
+	    	end
+	    @SDconstraint(m,M_obs[n,:,:]>=0)
+	    end
+
+
+	    #V(s) polynome
+	    #c0, c1, c2,    c3, c4,     c5,     c6,  c7,  c8,      c9
+	    # 1,  x,  y, theta, xy, xtheta, ytheta, x^2, y^2, theta^2
+
+	    #Initial configuration of the drone
+	    x_i=s_actual[1];
+	    y_i=s_actual[2];
+	    theta_i=s_actual[3];
+
+
+	    #V is minimum degree 2 must be verified or we must impose one more constraint
+	    #@constraint(m, -(c7+c8+c9)>=0.001)
+
+	    #First constraint initially in S_safe
+	    @constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2+small_epsilon<=b)
+
+		for i=1:1:size(Point,1)
+			x_i=Point[i,1]
+			y_i=Point[i,2]
+			theta_i=s_actual[3]
+			@constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2+small_epsilon<=b)
+			x_i=Point_s[i,1]
+			y_i=Point_s[i,2]
+			theta_i=s_suivant[3]
+			@constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2+small_epsilon<=b)
+		end
+
+	    #Second constraint with the obstacles (M_obs already SDP), for each of them
+	    for i=1:Nbr_obstacle
+			x_o=obstacle[i,1]
+			y_o=obstacle[i,2]
+	    	@constraint(m, M_obs[i,1,1]==c0+c1*x_o+c2*y_o+c4*x_o*y_o+c7*x_o^2+c8*y_o^2-b-small_epsilon)
+	    	@constraint(m, 2*M_obs[i,1,2]==c3+c5*x_o+c6*y_o)
+	    	@constraint(m, M_obs[i,2,2]==c9)
+	    end
+
+
+		s_dot=[-v*sin(s_actual[3])+w,v*cos(s_actual[3]),-K*(s_actual[3]-u)]
+		grad_V=[(c1+c4*s_actual[2]+c5*s_actual[3]+2*c7*s_actual[1]),(c2+c4*s_actual[1]+c6*s_actual[3]+2*c8*s_actual[2]),(c3+c5*s_actual[1]+c6*s_actual[2]+2*c9*s_actual[3])]
+		#X_vec=[1,s_itera[k+1,1],s_itera[k+1,2],s_itera[k+1,3],s_itera[k+1,3]^2,s_itera[k+1,3]^3,s_itera[k+1,3]^4,s_itera[k+1,3]^5,s_itera[k+1,3]^6,s_itera[k+1,3]^7,s_itera[k+1,3]^8,s_itera[k+1,3]^9]
+		@constraint(m,dot(grad_V,s_dot)<=0)
+	else
+		println("wrong input model\n ")
+		println("1: SDP  2:SOCP 3:LP\n ")
+	end
+
+	#for i=1:1:k
+	#	s_dot1=[-v*sin(s_actual[3])+w,v*cos(s_actual[3]),-K*(s_actual[3]-u)]
+	#	grad_V1=[(c1+c4*Point[i,2]+c5*s_actual[3]+2*c7*Point[i,1]),(c2+c4*Point[i,1]+c6*s_actual[3]+2*c8*Point[i,2]),(c3+c5*Point[i,1]+c6*Point[i,2]+2*c9*s_actual[3])]
+	#	@constraint(m,dot(grad_V1,s_dot1)<=0)
+	#end
+
+
+    solve(m)
+
+    C=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
+    return C
+end
+
+
+
 function find_index(matrix,element)
 	for i=1:1:length(matrix)
 		if abs(abs(matrix[i])-element)<1e-5
