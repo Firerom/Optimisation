@@ -4,7 +4,7 @@ include("optimisation1.jl")
 fichier="obs_behind_side"
 Data1=loadDataFromFile(fichier)
 small_epsilon=0.000001
-objectif_without=0
+objectif_without=-1500000
 #start: (50,100,0) [x,y,theta]
 #destination: (50,190) [x,y]
 #obstacle: x_obstacle1=Data1.obstacles[1][1]
@@ -67,11 +67,8 @@ m = Model(solver=MosekSolver())
 @variable(m, M_s[1:3,1:3])
 @variable(m,aux1[1:Nbr_obstacle,1:3,1:2])
 @variable(m,aux2[1:8,1:7])
-#variable de stockage pour le calcul de la norm (on a besoin d'un vecteur de taille 2  pour les Nbr_obstacle 2X2 matrix)
-@variable(m,Ab[1:Nbr_obstacle,1:3,1:3,1:2])
-#variable de stockage pour le calcul de la norm (on a besoin d'un vecteur de taille 2 ) pour chaque 2X2 matrix ! ça donne 8X8 vector
-@variable(m,Ab_dot[1:8,1:8,1:2])
-@variable(m,Ab_s[1:3,1:3,1:2])
+@variable(m,aux3[1:3,1:2])
+
 
 @variable(m,h)
 if abs(objectif_without)<1e-5
@@ -129,17 +126,29 @@ for l=1:8
 end
 
 
-
-#@SDconstraint(m,M_s<=0)
 for i=1:3
 	for j=i:3
 		@constraint(m,M_s[i,j]-M_s[j,i]==0)
-		@constraint(m,Ab_s[i,j,1]-2*M_s[i,j]==0)
-		@constraint(m,Ab_s[i,j,2]-(M_s[i,i]-M_s[j,j])==0)
-		@constraint(m,norm(Ab_s[i,j,:])  <=(M_s[i,i]+M_s[j,j]) )
 	end
-@constraint(m,M_s[i,i]>=0)
 end
+for l=1:3
+	for i=1:2
+		if i>=l
+			valeur=i+1;
+		else
+			valeur=i;
+		end
+		@constraint(m,gain*aux3[l,i]>=0)
+		@constraint(m,gain*aux3[l,i]>=-gain*M_s[l,valeur])
+		@constraint(m,gain*aux3[l,i]>=gain*M_s[l,valeur])
+	end
+end
+for l=1:3
+	@constraint(m,(M_s[l,l])>=aux3[l,1]+aux3[l,2])
+end
+
+
+
 # V(s)
 # c0 c1 c2 c3   c4   c5  c6  c7  c8  c9   c10 c11  c12  c13 c14   c15  c16   c17
 # 1  x  y  th  x^2   xy  y^2 xth yth th^2 x^3 x^2y xy^2 y^3 thx^2 thxy thy^2 th^2x
@@ -158,7 +167,7 @@ theta_i=Data1.start[3];
 #First constraint initially in S_safe
 @constraint(m, c34*theta_i^4 + c32*theta_i^3*x_i + c33*theta_i^3*y_i + c19*theta_i^3 + c29*theta_i^2*x_i^2 + c30*theta_i^2*x_i*y_i + c17*theta_i^2*x_i + c31*theta_i^2*y_i^2 + c18*theta_i^2*y_i + c9*theta_i^2 + c25*theta_i*x_i^3
 + c26*theta_i*x_i^2*y_i + c14*theta_i*x_i^2 + c27*theta_i*x_i*y_i^2 + c15*theta_i*x_i*y_i + c7*theta_i*x_i + c28*theta_i*y_i^3 + c16*theta_i*y_i^2 + c8*theta_i*y_i + c3*theta_i + c20*x_i^4 + c21*x_i^3*y_i + c10*x_i^3 + c22*x_i^2*y_i^2
-+ c11*x_i^2*y_i + c4*x_i^2 + c23*x_i*y_i^3 + c12*x_i*y_i^2 + c5*x_i*y_i + c1*x_i + c24*y_i^4 + c13*y_i^3 + c6*y_i^2 + c2*y_i + c0<=b)
++ c11*x_i^2*y_i + c4*x_i^2 + c23*x_i*y_i^3 + c12*x_i*y_i^2 + c5*x_i*y_i + c1*x_i + c24*y_i^4 + c13*y_i^3 + c6*y_i^2 + c2*y_i + c0<=b-small_epsilon)
 #Second constraint with the obstacles (M_obs already SDP), for each of them
 for i=1:Nbr_obstacle
 	x_o=Data1.obstacles[i][1]
@@ -180,7 +189,7 @@ end
 #y
 @constraint(m, 2*M[1,3]==-(2*c6*v + c5*w + K*c8*u))
 #t
-@constraint(m, 2*M[1,4]==-(2*c6*v + c5*w + K*c8*u))
+@constraint(m, 2*M[1,4]==-(c8*v + c7*w + 2*K*c9*u))
 #x^2
 @constraint(m, 2*M[1,6]+M[2,2]==-(c11*v + 3*c10*w + K*c14*u))
 #y^2
@@ -192,7 +201,7 @@ end
 #t*x
 @constraint(m, 2*M[2,4]== -(c15*v + 2*c14*w + 2*K*c17*u))
 #t*y
-@constraint(m, 2*M[3,4]== -(2*c16*v + c15*w + 2*K*c18*u))
+@constraint(m, 2*M[3,4]==-(2*c16*v + c15*w + 2*K*c18*u))
 #x^3
 @constraint(m, 2*M[2,6]== -(c21*v + 4*c20*w + K*c25*u))
 #y^3
@@ -230,17 +239,17 @@ end
 #x^3*y
 @constraint(m, 2*M[5,6]==0)
 #x*y^3
-@constraint(m, 2*M[5,6]==0)
+@constraint(m, 2*M[5,7]==0)
 
 #fourth constraint V(S_final)<h
 x_o=Data1.destination[1]
 y_o=Data1.destination[2]
-@constraint(m, -M_s[1,1]==c20*x_o^4 + c21*x_o^3*y_o + c10*x_o^3 + c22*x_o^2*y_o^2 + c11*x_o^2*y_o + c4*x_o^2 + c23*x_o*y_o^3 + c12*x_o*y_o^2 + c5*x_o*y_o + c1*x_o + c24*y_o^4
-+ c13*y_o^3 + c6*y_o^2 + c2*y_o + c0-h-small_epsilon)
-@constraint(m, -2*M_s[1,2]==c25*x_o^3 + c26*x_o^2*y_o + c14*x_o^2 + c27*x_o*y_o^2 + c15*x_o*y_o + c7*x_o + c28*y_o^3 + c16*y_o^2 + c8*y_o + c3)
-@constraint(m,-( M_s[2,2]+2*M_s[1,3])==c29*x_o^2 + c30*x_o*y_o + c17*x_o + c31*y_o^2 + c18*y_o + c9)
-@constraint(m, -(2*M_s[2,3])==c19 + c32*x_o + c33*y_o)
-@constraint(m, -(M_s[3,3])==c34)
+@constraint(m, M_s[1,1]==-(c20*x_o^4 + c21*x_o^3*y_o + c10*x_o^3 + c22*x_o^2*y_o^2 + c11*x_o^2*y_o + c4*x_o^2 + c23*x_o*y_o^3 + c12*x_o*y_o^2 + c5*x_o*y_o + c1*x_o + c24*y_o^4
++ c13*y_o^3 + c6*y_o^2 + c2*y_o + c0-h-small_epsilon))
+@constraint(m, 2*M_s[1,2]==-(c25*x_o^3 + c26*x_o^2*y_o + c14*x_o^2 + c27*x_o*y_o^2 + c15*x_o*y_o + c7*x_o + c28*y_o^3 + c16*y_o^2 + c8*y_o + c3))
+@constraint(m, M_s[2,2]+2*M_s[1,3]==-(c29*x_o^2 + c30*x_o*y_o + c17*x_o + c31*y_o^2 + c18*y_o + c9))
+@constraint(m, 2*M_s[2,3]==-(c19 + c32*x_o + c33*y_o))
+@constraint(m, M_s[3,3]==-c34)
 
 
 
@@ -272,12 +281,11 @@ if u==pi
 else
 	ustring="0"
 end
-file_name=string("Result_Q4_LP/Q4_",ustring,"_",fichier,"_",h,".txt")
+file_name=string("Result_Q4_SDP/Q4_",ustring,"_",fichier,"_",h,".txt")
 ci=getvalue([c0 c1 c2 c3   c4   c5  c6  c7  c8  c9   c10 c11  c12  c13 c14   c15  c16   c17 c18   c19  c20 c21  c22    c23  c24 c25   c26    c27    c28   c29     c30    c31     c32   c33   c34])
 writedlm(file_name, ci)
 
 println(getvalue([c0 c1 c2 c3   c4   c5  c6  c7  c8  c9   c10 c11  c12  c13 c14   c15  c16   c17 c18   c19  c20 c21  c22    c23  c24 c25   c26    c27    c28   c29     c30    c31     c32   c33   c34]))
-
-
+println(getvalue(h))
 
 ;

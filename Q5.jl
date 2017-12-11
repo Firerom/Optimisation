@@ -11,12 +11,12 @@ small_epsilon=0.000001
 #le nombre d'obstacle
 Nbr_obstacle=size(Data1.obstacles,1)
 
-u=3*pi/4
+u=3*pi/10
 w=0
 v=6
 K=0.2
 b=0
-Time_of_fligth=1
+Time_of_fligth=20
 Time_step=0.1
 Number_t_step=Time_of_fligth/Time_step
 m = Model(solver=MosekSolver())
@@ -39,16 +39,8 @@ m = Model(solver=MosekSolver())
 #@variable(m,M[1:12,1:12], Symmetric)
 #@SDconstraint(m,M<=0)
 
-
-
 #### on peut jouer avec SDP ou pas, pour voir ce que ça fait en plus
 #(si SDP, on oblige V_dot<0 partout !)
-
-
-
-
-
-
 
 # each matrix obstacle must be symmetric and SDP
 for n=1:Nbr_obstacle
@@ -70,9 +62,6 @@ x_i=Data1.start[1];
 y_i=Data1.start[2];
 theta_i=Data1.start[3];
 
-
-
-
 ## First time step
 #First constraint initially in S_safe
 @constraint(m, c0+c1*x_i+c2*y_i+c3*theta_i+c4*x_i*y_i+c5*x_i*theta_i+c6*y_i*theta_i+c7*x_i^2+c8*y_i^2+c9*theta_i^2<=b-small_epsilon)
@@ -88,15 +77,15 @@ k=0
 #for k=1:Number_t_step
 k=1
 while(k<Number_t_step+1)
-s_dot=[-v*sin(s_itera[k,3])+w,v*cos(s_itera[k,3]),-K*(s_itera[k,3]-u)]
-s_itera[k+1,1]=s_itera[k,1]+Time_step*s_dot[1]
-s_itera[k+1,2]=s_itera[k,2]+Time_step*s_dot[2]
-s_itera[k+1,3]=s_itera[k,3]+Time_step*s_dot[3]
-grad_V=[(c1+c4*s_itera[k+1,2]+c5*s_itera[k+1,3]+2*c7*s_itera[k+1,1]),(c2+c4*s_itera[k+1,1]+c6*s_itera[k+1,3]+2*c8*s_itera[k+1,2]),(c3+c5*s_itera[k+1,1]+c6*s_itera[k+1,2]+2*c9*s_itera[k+1,3])]
-#X_vec=[1,s_itera[k+1,1],s_itera[k+1,2],s_itera[k+1,3],s_itera[k+1,3]^2,s_itera[k+1,3]^3,s_itera[k+1,3]^4,s_itera[k+1,3]^5,s_itera[k+1,3]^6,s_itera[k+1,3]^7,s_itera[k+1,3]^8,s_itera[k+1,3]^9]
-@constraint(m,dot(grad_V,s_dot)<=0)
+	s_dot=[-v*sin(s_itera[k,3])+w,v*cos(s_itera[k,3]),-K*(s_itera[k,3]-u)]
+	s_itera[k+1,1]=s_itera[k,1]+Time_step*s_dot[1]
+	s_itera[k+1,2]=s_itera[k,2]+Time_step*s_dot[2]
+	s_itera[k+1,3]=s_itera[k,3]+Time_step*s_dot[3]
+	grad_V=[(c1+c4*s_itera[k+1,2]+c5*s_itera[k+1,3]+2*c7*s_itera[k+1,1]),(c2+c4*s_itera[k+1,1]+c6*s_itera[k+1,3]+2*c8*s_itera[k+1,2]),(c3+c5*s_itera[k+1,1]+c6*s_itera[k+1,2]+2*c9*s_itera[k+1,3])]
+	#X_vec=[1,s_itera[k+1,1],s_itera[k+1,2],s_itera[k+1,3],s_itera[k+1,3]^2,s_itera[k+1,3]^3,s_itera[k+1,3]^4,s_itera[k+1,3]^5,s_itera[k+1,3]^6,s_itera[k+1,3]^7,s_itera[k+1,3]^8,s_itera[k+1,3]^9]
+	@constraint(m,dot(grad_V,s_dot)<=0)
 
-k=k+1
+	k=k+1
 
 end
 
@@ -141,7 +130,7 @@ if u==pi
 else
 	ustring="0"
 end
-file_name=string("Q1_",ustring,"_",fichier,".txt")
+file_name=string("Q5_",ustring,"_",fichier,".txt")
 ci=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
 writedlm(file_name, ci)
 
