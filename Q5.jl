@@ -1,6 +1,7 @@
 include("optimisation1.jl")
 fichier="obs_behind_side"
 Data1=loadDataFromFile(fichier)
+saveDataToFileTXT(Data1,fichier)
 small_epsilon=0.000001
 #start: (50,100,0) [x,y,theta]
 #destination: (50,190) [x,y]
@@ -133,7 +134,6 @@ end
 file_name=string("Q5_",ustring,"_",fichier,".txt")
 ci=getvalue([c0 c1 c2 c3 c4 c5 c6 c7 c8 c9])
 writedlm(file_name, ci)
-
-
+savetrajectoryToFileTXT2(s_itera,fichier)
 
 ;

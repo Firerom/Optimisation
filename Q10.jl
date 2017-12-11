@@ -28,7 +28,7 @@ Nbr_obstacle=size(Data1.obstacles,1)
 u= 0#test for pi after
 v=6
 K=0.2
-b=0.001
+b=1
 
 
 for i=1:Nbr_obstacle
@@ -111,7 +111,7 @@ end
 
 x_o=Data1.obstacles[1][1]
 y_o=Data1.obstacles[1][2]
-@constraint(m, con2, -M_obs[1,1,1]==-(c0+c1*x_o+c2*y_o+c4*x_o*y_o+c7*x_o^2+c8*y_o^2-b-0*small_epsilon))
+@constraint(m, con2, -M_obs[1,1,1]+(c0+c1*x_o+c2*y_o+c4*x_o*y_o+c7*x_o^2+c8*y_o^2)==b+small_epsilon)
 
 
 

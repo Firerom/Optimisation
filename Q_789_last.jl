@@ -7,7 +7,7 @@ Data1=loadDataFromFile(fichier)
 saveDataToFileTXT(Data1,fichier)
 
 # if generateData of n obstacle
-#Data1=generateData(150)
+#Data1=generateData(100)
 #saveDataToFileTXT(Data1,fichier)
 #saveDataToFile(Data1,fichier)
 
@@ -22,10 +22,10 @@ clear_console()
 v=6
 K=0.2
 b=0
-w=0
+w=2
 Time_of_fligth=20
 Time_step=0.1
-Number_t_step=400
+Number_t_step=600
 Time_of_fligth=Time_step*Number_t_step
 #L=obstacle_near(fichier,[70 90])
 k=21
@@ -185,8 +185,14 @@ while t<=Number_t_step
 		write_console(s_enreg[i,:],"")
 	end=#
 	#write_console(norm(s_enreg[t,1:2].'-s_final))
-	write_console("\n----------------------\n","")
+	if(t>Number_t_step)
+		#write_console("S_trajet: ",s_enreg)
+		s_enreg_final=s_enreg
+		break
+	end
+
 	for i=1:count
+		#write_console("",i)
 		if(norm(s_enreg[t+i-count,1:2].'-s_final)<1)#moins d'un mettre 'lun de lautre ->ok
 			s_enreg_final=s_enreg[1:(t+i-count),1:3]
 			t=Number_t_step+1
@@ -200,7 +206,7 @@ while t<=Number_t_step
 	end
 
 	u_possible=[0]
-
+write_console("\n----------------------\n","")
 end
 
 write_console("S_trajet: ",s_enreg)
