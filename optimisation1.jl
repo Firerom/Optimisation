@@ -280,9 +280,8 @@ function barrier(obstacle,s_actual,s_suivant,u,w,Time_step,model)
     @variable(m, c8)
     @variable(m, c9)
     #matrices SDP for obstacle constraint
+	@variable(m, M_obs[1:Nbr_obstacle,1:2,1:2])
 	if(model==1)
-	    @variable(m, M_obs[1:Nbr_obstacle,1:2,1:2])
-
 
 	    # each matrix obstacle must be symmetric and SDP
 	    for n=1:Nbr_obstacle
@@ -293,8 +292,40 @@ function barrier(obstacle,s_actual,s_suivant,u,w,Time_step,model)
 	    	end
 	    @SDconstraint(m,M_obs[n,:,:]>=0)
 	    end
+	elseif model==2
+		@variable(m,Ab[1:Nbr_obstacle,1:2])
+		for n=1:Nbr_obstacle
+			for i=1:2
+				for j=i:2
+					@constraint(m,M_obs[n,i,j]-M_obs[n,j,i]==0)
+				end
+				#element diagonaux supéreiur à zero
+				@constraint(m,M_obs[n,i,i]>=0)
+			end
 
+		@constraint(m,Ab[n,1]-2*M_obs[n,1,2]==0)
+		@constraint(m,Ab[n,2]-(M_obs[n,1,1]-M_obs[n,2,2])==0)
+		@constraint(m,norm(Ab[n,:])  <=(M_obs[n,1,1]+M_obs[n,2,2]))
+		end
+	elseif model==3
+		gain=15000;
+		for n=1:Nbr_obstacle
+			for i=1:2
+				for j=i:2
+					@constraint(m,M_obs[n,i,j]-M_obs[n,j,i]==0)
+				end
+			end
+		#@SDconstraint(m,M_obs[n,:,:]>=0)
+		@constraint(m,(gain*M_obs[n,1,1])>=gain*M_obs[n,1,2])
+		@constraint(m,(gain*M_obs[n,1,1])>=-gain*M_obs[n,1,2])
+		@constraint(m,(gain*M_obs[n,2,2])>=gain*M_obs[n,2,1])
+		@constraint(m,(gain*M_obs[n,2,2])>=-gain*M_obs[n,2,1])
+		end
 
+	else
+		println("wrong input model\n ")
+		println("1: SDP  2:SOCP 3:LP\n ")
+	end
 	    #V(s) polynome
 	    #c0, c1, c2,    c3, c4,     c5,     c6,  c7,  c8,      c9
 	    # 1,  x,  y, theta, xy, xtheta, ytheta, x^2, y^2, theta^2
@@ -336,10 +367,8 @@ function barrier(obstacle,s_actual,s_suivant,u,w,Time_step,model)
 		grad_V=[(c1+c4*s_actual[2]+c5*s_actual[3]+2*c7*s_actual[1]),(c2+c4*s_actual[1]+c6*s_actual[3]+2*c8*s_actual[2]),(c3+c5*s_actual[1]+c6*s_actual[2]+2*c9*s_actual[3])]
 		#X_vec=[1,s_itera[k+1,1],s_itera[k+1,2],s_itera[k+1,3],s_itera[k+1,3]^2,s_itera[k+1,3]^3,s_itera[k+1,3]^4,s_itera[k+1,3]^5,s_itera[k+1,3]^6,s_itera[k+1,3]^7,s_itera[k+1,3]^8,s_itera[k+1,3]^9]
 		@constraint(m,dot(grad_V,s_dot)<=0)
-	else
-		println("wrong input model\n ")
-		println("1: SDP  2:SOCP 3:LP\n ")
-	end
+
+
 
 	#for i=1:1:k
 	#	s_dot1=[-v*sin(s_actual[3])+w,v*cos(s_actual[3]),-K*(s_actual[3]-u)]

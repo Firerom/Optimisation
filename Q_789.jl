@@ -1,6 +1,6 @@
 include("optimisation1.jl")
 
-fichier="Romain"
+fichier="Romain1"
 
 # if load from a file
 Data1=loadDataFromFile(fichier)
